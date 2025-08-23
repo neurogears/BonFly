@@ -1,0 +1,42 @@
+%YAML 1.1
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/neurogears/BonFly/main/src/Schemas/StimuliSpecification.json
+
+trials:
+  [    
+    {loomingCircleStimuli: &loomingCircleTrial {
+          animationSettings: &animationTrial
+            {
+              duration: 0.25,
+              initialRadius: 0.5,
+              initialVirtualDistance: 12.5,
+              linearApproachingVelocity: 50,
+              maxRadius: 12.5,
+              monitorDistance: 18.5,
+            },
+          delayOffset: 0,
+          delayOnset: 300,
+          backgroundColor: { a: 0, b: 0, g: 0, r: 0 },
+          color: { a: 1, b: 0, g: 0, r: 0 },
+        }
+    },    
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 16.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 13.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 18.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 18.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 17.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 14.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 11.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 16.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 13.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 14.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 13.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 13.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 10.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 11.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 17.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 13.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 13.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 16.75}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 12.75}}
+  ]

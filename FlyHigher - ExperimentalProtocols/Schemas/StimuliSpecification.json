@@ -219,7 +219,39 @@
                 "null"
             ]
         },
-        "optogeneticsStimuli": {
+        "optogeneticsContinuousStimuli": {
+            "default": null,
+            "properties": {
+                "amplitude": {
+                    "default": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "duration": {
+                    "default": 1,
+                    "minimum": 0,
+                    "type": "number"
+                },
+                "delayOnset": {
+                    "$ref": "#/definitions/delayOnset"
+                },
+                "ledTarget": {
+                    "default": "None",
+                    "enum": [
+                        "None",
+                        "Led0",
+                        "Led1",
+                        "Both"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": [
+                "object",
+                "null"
+            ]
+        },
+        "optogeneticsPulsedStimuli": {
             "default": null,
             "properties": {
                 "amplitude": {
@@ -243,6 +275,9 @@
                     "minimum": 1,
                     "type": "number"
                 },
+                "delayOnset": {
+                    "$ref": "#/definitions/delayOnset"
+                },
                 "ledTarget": {
                     "default": "None",
                     "enum": [
@@ -250,14 +285,6 @@
                         "Led0",
                         "Led1",
                         "Both"
-                    ],
-                    "type": "string"
-                },
-                "mode": {
-                    "default": "Continuous",
-                    "enum": [
-                        "Continuous",
-                        "Pulsed"
                     ],
                     "type": "string"
                 }
@@ -278,8 +305,11 @@
                 "loomingImageStimuli": {
                     "$ref": "#/definitions/loomingImageStimuli"
                 },
-                "optogeneticsStimuli": {
-                    "$ref": "#/definitions/optogeneticsStimuli"
+                "optogeneticsContinuousStimuli": {
+                    "$ref": "#/definitions/optogeneticsContinuousStimuli"
+                },                
+                "optogeneticsPulsedStimuli": {
+                    "$ref": "#/definitions/optogeneticsContinuousStimuli"
                 },
                 "movingCircleStimuli": {
                     "$ref": "#/definitions/movingCircleStimuli"

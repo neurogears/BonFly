@@ -1,0 +1,9 @@
+*.layout
+*.editor
+*.exe
+*.exe.settings
+Extensions
+bin
+obj
+Packages
+NuGet
