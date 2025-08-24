@@ -18,7 +18,7 @@
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:FileCapture">
-                <cv:FileName>ReferenceImages\Good.avi</cv:FileName>
+                <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Moita-Bonfly\ExampleVideos\Good.avi</cv:FileName>
                 <cv:PlaybackRate>99999</cv:PlaybackRate>
                 <cv:StartPosition>0</cv:StartPosition>
                 <cv:PositionUnits>Frames</cv:PositionUnits>
@@ -181,154 +181,373 @@
         <Name>ReferenceBrightness</Name>
         <Workflow>
           <Nodes>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>BackgroundImage</Name>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>EmptySpace</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>BackgroundImage</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:Threshold">
+                      <cv:ThresholdValue>80</cv:ThresholdValue>
+                      <cv:MaxValue>255</cv:MaxValue>
+                      <cv:ThresholdType>ToZero</cv:ThresholdType>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:FindContours">
+                      <cv:Mode>External</cv:Mode>
+                      <cv:Method>ChainApproxNone</cv:Method>
+                      <cv:Offset>
+                        <cv:X>0</cv:X>
+                        <cv:Y>0</cv:Y>
+                      </cv:Offset>
+                      <cv:MinArea xsi:nil="true" />
+                      <cv:MaxArea xsi:nil="true" />
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:BinaryRegionAnalysis" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:LargestBinaryRegion" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Contour</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:DrawContours">
+                      <cv:MaxLevel>1</cv:MaxLevel>
+                      <cv:Thickness>-1</cv:Thickness>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>ContourEmptySpace</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>CamFeed</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>ContourEmptySpace</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="RegionOfInterest" Selector="RegionOfInterest" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:Crop">
+                      <cv:RegionOfInterest>
+                        <cv:X>0</cv:X>
+                        <cv:Y>0</cv:Y>
+                        <cv:Width>1534</cv:Width>
+                        <cv:Height>1534</cv:Height>
+                      </cv:RegionOfInterest>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>ContourEmptySpace</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:WithLatestFrom" />
+                  </Expression>
+                  <Expression xsi:type="BitwiseAnd" />
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:RangeThreshold">
+                      <cv:Lower>
+                        <cv:Val0>140</cv:Val0>
+                        <cv:Val1>0</cv:Val1>
+                        <cv:Val2>0</cv:Val2>
+                        <cv:Val3>0</cv:Val3>
+                      </cv:Lower>
+                      <cv:Upper>
+                        <cv:Val0>250</cv:Val0>
+                        <cv:Val1>255</cv:Val1>
+                        <cv:Val2>255</cv:Val2>
+                        <cv:Val3>255</cv:Val3>
+                      </cv:Upper>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>EmptySpaceCamFeed</Name>
+                  </Expression>
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="6" To="7" Label="Source1" />
+                  <Edge From="8" To="11" Label="Source1" />
+                  <Edge From="9" To="10" Label="Source1" />
+                  <Edge From="10" To="11" Label="Source2" />
+                  <Edge From="11" To="13" Label="Source1" />
+                  <Edge From="12" To="13" Label="Source2" />
+                  <Edge From="13" To="14" Label="Source1" />
+                  <Edge From="14" To="15" Label="Source1" />
+                  <Edge From="15" To="16" Label="Source1" />
+                </Edges>
+              </Workflow>
             </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:Threshold">
-                <cv:ThresholdValue>80</cv:ThresholdValue>
-                <cv:MaxValue>255</cv:MaxValue>
-                <cv:ThresholdType>Binary</cv:ThresholdType>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:FindContours">
-                <cv:Mode>External</cv:Mode>
-                <cv:Method>ChainApproxNone</cv:Method>
-                <cv:Offset>
-                  <cv:X>0</cv:X>
-                  <cv:Y>0</cv:Y>
-                </cv:Offset>
-                <cv:MinArea xsi:nil="true" />
-                <cv:MaxArea xsi:nil="true" />
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:BinaryRegionAnalysis" />
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:LargestBinaryRegion" />
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>Contour</Selector>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:DrawContours">
-                <cv:MaxLevel>1</cv:MaxLevel>
-                <cv:Thickness>-1</cv:Thickness>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="rx:PublishSubject">
-              <Name>ContourEmptySpace</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>CamFeed</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>ContourEmptySpace</Name>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="RegionOfInterest" Selector="RegionOfInterest" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:Crop">
-                <cv:RegionOfInterest>
-                  <cv:X>0</cv:X>
-                  <cv:Y>0</cv:Y>
-                  <cv:Width>1534</cv:Width>
-                  <cv:Height>1534</cv:Height>
-                </cv:RegionOfInterest>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>ContourEmptySpace</Name>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:WithLatestFrom" />
-            </Expression>
-            <Expression xsi:type="BitwiseAnd" />
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:RangeThreshold">
-                <cv:Lower>
-                  <cv:Val0>220</cv:Val0>
-                  <cv:Val1>0</cv:Val1>
-                  <cv:Val2>0</cv:Val2>
-                  <cv:Val3>0</cv:Val3>
-                </cv:Lower>
-                <cv:Upper>
-                  <cv:Val0>250</cv:Val0>
-                  <cv:Val1>255</cv:Val1>
-                  <cv:Val2>255</cv:Val2>
-                  <cv:Val3>255</cv:Val3>
-                </cv:Upper>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="rx:PublishSubject">
-              <Name>EmptySpaceCamFeed</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>BackgroundImage</Name>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:Threshold">
-                <cv:ThresholdValue>80</cv:ThresholdValue>
-                <cv:MaxValue>255</cv:MaxValue>
-                <cv:ThresholdType>Binary</cv:ThresholdType>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:FindContours">
-                <cv:Mode>External</cv:Mode>
-                <cv:Method>ChainApproxNone</cv:Method>
-                <cv:Offset>
-                  <cv:X>0</cv:X>
-                  <cv:Y>0</cv:Y>
-                </cv:Offset>
-                <cv:MinArea>30000</cv:MinArea>
-                <cv:MaxArea>400000</cv:MaxArea>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:DrawContours">
-                <cv:MaxLevel>1</cv:MaxLevel>
-                <cv:Thickness>-1</cv:Thickness>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="rx:PublishSubject">
-              <Name>ContourArenas</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>CamFeed</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>ContourArenas</Name>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="RegionOfInterest" Selector="RegionOfInterest" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:Crop">
-                <cv:RegionOfInterest>
-                  <cv:X>0</cv:X>
-                  <cv:Y>0</cv:Y>
-                  <cv:Width>1536</cv:Width>
-                  <cv:Height>1536</cv:Height>
-                </cv:RegionOfInterest>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>ContourArenas</Name>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:WithLatestFrom" />
-            </Expression>
-            <Expression xsi:type="BitwiseAnd" />
-            <Expression xsi:type="rx:PublishSubject">
-              <Name>ArenasCamFeed</Name>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>ArenaContours</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>BackgroundImage</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="ThresholdValue" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:Threshold">
+                      <cv:ThresholdValue>80</cv:ThresholdValue>
+                      <cv:MaxValue>255</cv:MaxValue>
+                      <cv:ThresholdType>Binary</cv:ThresholdType>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:FindContours">
+                      <cv:Mode>External</cv:Mode>
+                      <cv:Method>ChainApproxNone</cv:Method>
+                      <cv:Offset>
+                        <cv:X>0</cv:X>
+                        <cv:Y>0</cv:Y>
+                      </cv:Offset>
+                      <cv:MinArea>30000</cv:MinArea>
+                      <cv:MaxArea>400000</cv:MaxArea>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:DrawContours">
+                      <cv:MaxLevel>1</cv:MaxLevel>
+                      <cv:Thickness>-1</cv:Thickness>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>ContourChamber</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:FindContours">
+                      <cv:Mode>External</cv:Mode>
+                      <cv:Method>ChainApproxNone</cv:Method>
+                      <cv:Offset>
+                        <cv:X>0</cv:X>
+                        <cv:Y>0</cv:Y>
+                      </cv:Offset>
+                      <cv:MinArea>50000</cv:MinArea>
+                      <cv:MaxArea>500000</cv:MaxArea>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:DrawContours">
+                      <cv:MaxLevel>1</cv:MaxLevel>
+                      <cv:Thickness>-1</cv:Thickness>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>ContourArenas</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:Threshold">
+                      <cv:ThresholdValue>80</cv:ThresholdValue>
+                      <cv:MaxValue>255</cv:MaxValue>
+                      <cv:ThresholdType>BinaryInv</cv:ThresholdType>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:FindContours">
+                      <cv:Mode>External</cv:Mode>
+                      <cv:Method>ChainApproxNone</cv:Method>
+                      <cv:Offset>
+                        <cv:X>0</cv:X>
+                        <cv:Y>0</cv:Y>
+                      </cv:Offset>
+                      <cv:MinArea>4000</cv:MinArea>
+                      <cv:MaxArea>850000</cv:MaxArea>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:DrawContours">
+                      <cv:MaxLevel>1</cv:MaxLevel>
+                      <cv:Thickness>-1</cv:Thickness>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>CountourEdges</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>CamFeed</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>ContourChamber</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="RegionOfInterest" Selector="RegionOfInterest" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:Crop">
+                      <cv:RegionOfInterest>
+                        <cv:X>0</cv:X>
+                        <cv:Y>0</cv:Y>
+                        <cv:Width>1536</cv:Width>
+                        <cv:Height>1536</cv:Height>
+                      </cv:RegionOfInterest>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>ContourChamber</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:WithLatestFrom" />
+                  </Expression>
+                  <Expression xsi:type="BitwiseAnd" />
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>ArenasCamFeed</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>CamFeed</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>ContourEmptySpace</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="RegionOfInterest" Selector="RegionOfInterest" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:Crop">
+                      <cv:RegionOfInterest>
+                        <cv:X>0</cv:X>
+                        <cv:Y>0</cv:Y>
+                        <cv:Width>1534</cv:Width>
+                        <cv:Height>1534</cv:Height>
+                      </cv:RegionOfInterest>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:ConvertColor">
+                      <cv:Conversion>Gray2Bgra</cv:Conversion>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>ContourArenas</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>ContourEmptySpace</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="RegionOfInterest" Selector="RegionOfInterest" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:Crop">
+                      <cv:RegionOfInterest>
+                        <cv:X>0</cv:X>
+                        <cv:Y>0</cv:Y>
+                        <cv:Width>1534</cv:Width>
+                        <cv:Height>1534</cv:Height>
+                      </cv:RegionOfInterest>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:WithLatestFrom" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:Mask">
+                      <cv:FillValue>
+                        <cv:Val0>80</cv:Val0>
+                        <cv:Val1>70</cv:Val1>
+                        <cv:Val2>30</cv:Val2>
+                        <cv:Val3>0</cv:Val3>
+                      </cv:FillValue>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>CountourEdges</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>ContourEmptySpace</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="RegionOfInterest" Selector="RegionOfInterest" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:Crop">
+                      <cv:RegionOfInterest>
+                        <cv:X>0</cv:X>
+                        <cv:Y>0</cv:Y>
+                        <cv:Width>1534</cv:Width>
+                        <cv:Height>1534</cv:Height>
+                      </cv:RegionOfInterest>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:Mask">
+                      <cv:FillValue>
+                        <cv:Val0>20</cv:Val0>
+                        <cv:Val1>20</cv:Val1>
+                        <cv:Val2>20</cv:Val2>
+                        <cv:Val3>0</cv:Val3>
+                      </cv:FillValue>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>EdgesCamFeed</Name>
+                  </Expression>
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="2" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source2" />
+                  <Edge From="1" To="9" Label="Source2" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="2" To="6" Label="Source1" />
+                  <Edge From="2" To="9" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="6" To="7" Label="Source1" />
+                  <Edge From="7" To="8" Label="Source1" />
+                  <Edge From="9" To="10" Label="Source1" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="11" To="12" Label="Source1" />
+                  <Edge From="13" To="16" Label="Source1" />
+                  <Edge From="14" To="15" Label="Source1" />
+                  <Edge From="15" To="16" Label="Source2" />
+                  <Edge From="16" To="18" Label="Source1" />
+                  <Edge From="17" To="18" Label="Source2" />
+                  <Edge From="18" To="19" Label="Source1" />
+                  <Edge From="19" To="20" Label="Source1" />
+                  <Edge From="21" To="24" Label="Source1" />
+                  <Edge From="22" To="23" Label="Source1" />
+                  <Edge From="23" To="24" Label="Source2" />
+                  <Edge From="24" To="25" Label="Source1" />
+                  <Edge From="25" To="30" Label="Source1" />
+                  <Edge From="26" To="29" Label="Source1" />
+                  <Edge From="27" To="28" Label="Source1" />
+                  <Edge From="28" To="29" Label="Source2" />
+                  <Edge From="29" To="30" Label="Source2" />
+                  <Edge From="30" To="31" Label="Source1" />
+                  <Edge From="31" To="36" Label="Source1" />
+                  <Edge From="32" To="35" Label="Source1" />
+                  <Edge From="33" To="34" Label="Source1" />
+                  <Edge From="34" To="35" Label="Source2" />
+                  <Edge From="35" To="36" Label="Source2" />
+                  <Edge From="36" To="37" Label="Source1" />
+                  <Edge From="37" To="38" Label="Source1" />
+                </Edges>
+              </Workflow>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>ReferenceArenas</Name>
@@ -339,7 +558,7 @@
             </Expression>
             <Expression xsi:type="VisualizerMapping" />
             <Expression xsi:type="SubscribeSubject">
-              <Name>ArenasCamFeed</Name>
+              <Name>EdgesCamFeed</Name>
             </Expression>
             <Expression xsi:type="VisualizerMapping" />
             <Expression xsi:type="SubscribeSubject">
@@ -359,41 +578,15 @@
             <Expression xsi:type="WorkflowOutput" />
           </Nodes>
           <Edges>
-            <Edge From="0" To="1" Label="Source1" />
-            <Edge From="1" To="2" Label="Source1" />
             <Edge From="2" To="3" Label="Source1" />
-            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="3" To="10" Label="Source1" />
             <Edge From="4" To="5" Label="Source1" />
-            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="5" To="10" Label="Source2" />
             <Edge From="6" To="7" Label="Source1" />
-            <Edge From="8" To="11" Label="Source1" />
-            <Edge From="9" To="10" Label="Source1" />
-            <Edge From="10" To="11" Label="Source2" />
-            <Edge From="11" To="13" Label="Source1" />
-            <Edge From="12" To="13" Label="Source2" />
-            <Edge From="13" To="14" Label="Source1" />
-            <Edge From="14" To="15" Label="Source1" />
-            <Edge From="15" To="16" Label="Source1" />
-            <Edge From="17" To="18" Label="Source1" />
-            <Edge From="18" To="19" Label="Source1" />
-            <Edge From="19" To="20" Label="Source1" />
-            <Edge From="20" To="21" Label="Source1" />
-            <Edge From="22" To="25" Label="Source1" />
-            <Edge From="23" To="24" Label="Source1" />
-            <Edge From="24" To="25" Label="Source2" />
-            <Edge From="25" To="27" Label="Source1" />
-            <Edge From="26" To="27" Label="Source2" />
-            <Edge From="27" To="28" Label="Source1" />
-            <Edge From="28" To="29" Label="Source1" />
-            <Edge From="30" To="31" Label="Source1" />
-            <Edge From="31" To="38" Label="Source1" />
-            <Edge From="32" To="33" Label="Source1" />
-            <Edge From="33" To="38" Label="Source2" />
-            <Edge From="34" To="35" Label="Source1" />
-            <Edge From="35" To="38" Label="Source3" />
-            <Edge From="36" To="37" Label="Source1" />
-            <Edge From="37" To="38" Label="Source4" />
-            <Edge From="38" To="39" Label="Source1" />
+            <Edge From="7" To="10" Label="Source3" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="9" To="10" Label="Source4" />
+            <Edge From="10" To="11" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>

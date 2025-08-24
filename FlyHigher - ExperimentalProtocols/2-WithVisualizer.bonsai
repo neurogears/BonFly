@@ -5,185 +5,239 @@
                  xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
                  xmlns:dsp="clr-namespace:Bonsai.Dsp;assembly=Bonsai.Dsp"
                  xmlns:ui="clr-namespace:Bonsai.Design;assembly=Bonsai.Design"
-                 xmlns:p1="clr-namespace:Bonsai.Vision.Design;assembly=Bonsai.Vision.Design"
-                 xmlns:viz="clr-namespace:Bonsai.Design.Visualizers;assembly=Bonsai.Design.Visualizers"
                  xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
                  xmlns:wie="clr-namespace:Bonsai.Windows.Input;assembly=Bonsai.Windows.Input"
                  xmlns:harp="clr-namespace:Bonsai.Harp;assembly=Bonsai.Harp"
-                 xmlns:p2="clr-namespace:Bonsai.Harp.CF;assembly=Bonsai.Harp.CF"
+                 xmlns:p1="clr-namespace:Bonsai.Harp.CF;assembly=Bonsai.Harp.CF"
                  xmlns:spk="clr-namespace:Bonsai.Spinnaker;assembly=Bonsai.Spinnaker"
                  xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
                  xmlns:gl="clr-namespace:Bonsai.Shaders;assembly=Bonsai.Shaders"
                  xmlns:res="clr-namespace:Bonsai.Resources;assembly=Bonsai.System"
-                 xmlns:p3="clr-namespace:;assembly=Extensions"
+                 xmlns:p2="clr-namespace:;assembly=Extensions"
                  xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
                  xmlns:sys="clr-namespace:System;assembly=mscorlib"
-                 xmlns:p4="clr-namespace:AutomaticGenerators;assembly=Extensions"
+                 xmlns:viz="clr-namespace:Bonsai.Design.Visualizers;assembly=Bonsai.Design.Visualizers"
+                 xmlns:p3="clr-namespace:AutomaticGenerators;assembly=Extensions"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
     <Nodes>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="cv:FileCapture">
-          <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Moita-Bonfly\ExampleVideos\Good.avi</cv:FileName>
-          <cv:PlaybackRate>0</cv:PlaybackRate>
-          <cv:StartPosition>0</cv:StartPosition>
-          <cv:PositionUnits>Frames</cv:PositionUnits>
-          <cv:Loop>false</cv:Loop>
-          <cv:Playing>true</cv:Playing>
-        </Combinator>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="cv:Grayscale" />
-      </Expression>
-      <Expression xsi:type="rx:PublishSubject">
-        <Name>Video</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>Video</Name>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="cv:BackgroundSubtraction">
-          <cv:BackgroundFrames>1</cv:BackgroundFrames>
-          <cv:AdaptationRate>1</cv:AdaptationRate>
-          <cv:ThresholdValue>7</cv:ThresholdValue>
-          <cv:ThresholdType>Binary</cv:ThresholdType>
-          <cv:SubtractionMethod>Absolute</cv:SubtractionMethod>
-        </Combinator>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="cv:FindContours">
-          <cv:Mode>External</cv:Mode>
-          <cv:Method>ChainApproxNone</cv:Method>
-          <cv:Offset>
-            <cv:X>0</cv:X>
-            <cv:Y>0</cv:Y>
-          </cv:Offset>
-          <cv:MinArea>5</cv:MinArea>
-          <cv:MaxArea xsi:nil="true" />
-        </Combinator>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="cv:DrawContours">
-          <cv:MaxLevel>1</cv:MaxLevel>
-          <cv:Thickness>-1</cv:Thickness>
-        </Combinator>
-      </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="dsp:CountNonZero" />
-      </Expression>
-      <Expression xsi:type="rx:PublishSubject">
-        <Name>GPIO</Name>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>SessionTimer</Name>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="ui:ObjectTextVisualizer" />
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>FileName</Name>
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>Item1</Selector>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="ui:ObjectTextVisualizer" />
-      </Expression>
-      <Expression xsi:type="MemberSelector">
-        <Selector>Item2</Selector>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="ui:ObjectTextVisualizer" />
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>Video</Name>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="p1:IplImageVisualizer" />
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>Video</Name>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="p1:IplImageVisualizer" />
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>GPIO</Name>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="viz:TimeSeriesVisualizer" />
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>GPIO</Name>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="viz:TimeSeriesVisualizer" />
-      </Expression>
-      <Expression xsi:type="gui:TableLayoutPanelBuilder">
-        <gui:Name>ExperimentVisualizer</gui:Name>
-        <gui:Enabled>true</gui:Enabled>
-        <gui:Visible>true</gui:Visible>
-        <gui:Font>Microsoft Sans Serif, 14pt</gui:Font>
-        <gui:ColumnCount>6</gui:ColumnCount>
-        <gui:RowCount>19</gui:RowCount>
-        <gui:ColumnStyles />
-        <gui:RowStyles />
-        <gui:CellSpans>
-          <gui:CellSpan ColumnSpan="1" RowSpan="1" />
-          <gui:CellSpan ColumnSpan="5" RowSpan="1" />
-          <gui:CellSpan ColumnSpan="6" RowSpan="1" />
-          <gui:CellSpan ColumnSpan="3" RowSpan="13" />
-          <gui:CellSpan ColumnSpan="3" RowSpan="13" />
-          <gui:CellSpan ColumnSpan="3" RowSpan="4" />
-          <gui:CellSpan ColumnSpan="3" RowSpan="4" />
-        </gui:CellSpans>
-      </Expression>
-      <Expression xsi:type="ui:VisualizerWindow">
-        <ui:Text>ExperimentMonitor</ui:Text>
-        <ui:Visible>true</ui:Visible>
-        <ui:Location>
-          <ui:X>0</ui:X>
-          <ui:Y>150</ui:Y>
-        </ui:Location>
-        <ui:Size>
-          <ui:Width>1200</ui:Width>
-          <ui:Height>850</ui:Height>
-        </ui:Size>
-        <ui:WindowState>Normal</ui:WindowState>
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>GPIO</Name>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="viz:TimeSeriesVisualizer" />
-      </Expression>
-      <Expression xsi:type="SubscribeSubject">
-        <Name>GPIO</Name>
-      </Expression>
-      <Expression xsi:type="VisualizerMapping">
-        <VisualizerType xsi:type="TypeMapping" TypeArguments="viz:TimeSeriesVisualizer" />
-      </Expression>
-      <Expression xsi:type="gui:TableLayoutPanelBuilder">
-        <gui:Enabled>true</gui:Enabled>
-        <gui:Visible>true</gui:Visible>
-        <gui:ColumnCount>2</gui:ColumnCount>
-        <gui:RowCount>1</gui:RowCount>
-        <gui:ColumnStyles />
-        <gui:RowStyles />
-        <gui:CellSpans />
-      </Expression>
-      <Expression xsi:type="ui:VisualizerWindow">
-        <ui:Text>GPIOstate</ui:Text>
-        <ui:Visible>true</ui:Visible>
-        <ui:Location>
-          <ui:X>1200</ui:X>
-          <ui:Y>535</ui:Y>
-        </ui:Location>
-        <ui:Size>
-          <ui:Width>500</ui:Width>
-          <ui:Height>215</ui:Height>
-        </ui:Size>
-        <ui:WindowState xsi:nil="true" />
+      <Expression xsi:type="GroupWorkflow">
+        <Name>Visualizer</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="cv:FileCapture">
+                <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Moita-Bonfly\ExampleVideos\Good.avi</cv:FileName>
+                <cv:PlaybackRate>0</cv:PlaybackRate>
+                <cv:StartPosition>0</cv:StartPosition>
+                <cv:PositionUnits>Frames</cv:PositionUnits>
+                <cv:Loop>false</cv:Loop>
+                <cv:Playing>true</cv:Playing>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="cv:Grayscale" />
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>Video</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Video</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="cv:BackgroundSubtraction">
+                <cv:BackgroundFrames>1</cv:BackgroundFrames>
+                <cv:AdaptationRate>1</cv:AdaptationRate>
+                <cv:ThresholdValue>7</cv:ThresholdValue>
+                <cv:ThresholdType>Binary</cv:ThresholdType>
+                <cv:SubtractionMethod>Absolute</cv:SubtractionMethod>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="cv:FindContours">
+                <cv:Mode>External</cv:Mode>
+                <cv:Method>ChainApproxNone</cv:Method>
+                <cv:Offset>
+                  <cv:X>0</cv:X>
+                  <cv:Y>0</cv:Y>
+                </cv:Offset>
+                <cv:MinArea>5</cv:MinArea>
+                <cv:MaxArea xsi:nil="true" />
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="cv:DrawContours">
+                <cv:MaxLevel>1</cv:MaxLevel>
+                <cv:Thickness>-1</cv:Thickness>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="dsp:CountNonZero" />
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>GPIO</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>SessionTimer</Name>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="ui:ObjectTextVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>FileName</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="ui:ObjectTextVisualizer" />
+            </Expression>
+            <Expression xsi:type="gui:TableLayoutPanelBuilder">
+              <gui:Name>ExperimentVisualizer</gui:Name>
+              <gui:Enabled>true</gui:Enabled>
+              <gui:Visible>true</gui:Visible>
+              <gui:Font>Microsoft Sans Serif, 20pt</gui:Font>
+              <gui:ColumnCount>12</gui:ColumnCount>
+              <gui:RowCount>1</gui:RowCount>
+              <gui:ColumnStyles />
+              <gui:RowStyles />
+              <gui:CellSpans>
+                <gui:CellSpan ColumnSpan="3" RowSpan="1" />
+                <gui:CellSpan ColumnSpan="9" RowSpan="1" />
+              </gui:CellSpans>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>ExperimentSession</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>0</ui:X>
+                <ui:Y>100</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>1190</ui:Width>
+                <ui:Height>85</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Video</Name>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>CamA - Door</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>0</ui:X>
+                <ui:Y>180</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>600</ui:Width>
+                <ui:Height>550</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Video</Name>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>CamB - Back</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>590</ui:X>
+                <ui:Y>180</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>600</ui:Width>
+                <ui:Height>550</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>GPIO</Name>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>StimuliSignal - CamA</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>0</ui:X>
+                <ui:Y>730</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>600</ui:Width>
+                <ui:Height>250</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>GPIO</Name>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>StimuliSignal - CamB</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>590</ui:X>
+                <ui:Y>730</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>600</ui:Width>
+                <ui:Height>250</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>GPIO</Name>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>GPIO - CamA</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>1180</ui:X>
+                <ui:Y>475</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>515</ui:Width>
+                <ui:Height>150</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>GPIO</Name>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>GPIO - CamB</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>1180</ui:X>
+                <ui:Y>620</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>515</ui:Width>
+                <ui:Height>150</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="9" To="10" Label="Source1" />
+            <Edge From="10" To="14" Label="Source1" />
+            <Edge From="11" To="12" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
+            <Edge From="13" To="14" Label="Source2" />
+            <Edge From="14" To="15" Label="Source1" />
+            <Edge From="16" To="17" Label="Source1" />
+            <Edge From="18" To="19" Label="Source1" />
+            <Edge From="20" To="21" Label="Source1" />
+            <Edge From="22" To="23" Label="Source1" />
+            <Edge From="24" To="25" Label="Source1" />
+            <Edge From="26" To="27" Label="Source1" />
+          </Edges>
+        </Workflow>
       </Expression>
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="wie:KeyDown">
@@ -259,18 +313,18 @@
                         <Value>100</Value>
                       </Combinator>
                     </Expression>
-                    <Expression xsi:type="p2:LedArrayCommand">
-                      <p2:Type>WriteAuxiliaryIntensity</p2:Type>
-                      <p2:Mask>Index0</p2:Mask>
+                    <Expression xsi:type="p1:LedArrayCommand">
+                      <p1:Type>WriteAuxiliaryIntensity</p1:Type>
+                      <p1:Mask>Index0</p1:Mask>
                     </Expression>
                     <Expression xsi:type="Combinator">
                       <Combinator xsi:type="BooleanProperty">
                         <Value>true</Value>
                       </Combinator>
                     </Expression>
-                    <Expression xsi:type="p2:LedArrayCommand">
-                      <p2:Type>SetAuxiliaryOutput</p2:Type>
-                      <p2:Mask>Index1</p2:Mask>
+                    <Expression xsi:type="p1:LedArrayCommand">
+                      <p1:Type>SetAuxiliaryOutput</p1:Type>
+                      <p1:Mask>Index1</p1:Mask>
                     </Expression>
                     <Expression xsi:type="Combinator">
                       <Combinator xsi:type="rx:Delay">
@@ -589,8 +643,8 @@ expects: Schemas/ .yml files</Description>
                     <Property Name="Path" DisplayName="⚠ Schema - OptoStim" Category="2. Experiment Design" />
                   </Expression>
                   <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="p3:LoadSettings">
-                      <p3:Path>Schemas\Repo\NoStimulus.yml</p3:Path>
+                    <Combinator xsi:type="p2:LoadSettings">
+                      <p2:Path>Schemas\Repo\NoStimulus.yml</p2:Path>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="rx:AsyncSubject">
@@ -600,8 +654,8 @@ expects: Schemas/ .yml files</Description>
                     <Property Name="Path" DisplayName="Schema - VisualStim" Category="2. Experiment Design" />
                   </Expression>
                   <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="p3:LoadSettings">
-                      <p3:Path>Schemas\Repo\NoStimulus.yml</p3:Path>
+                    <Combinator xsi:type="p2:LoadSettings">
+                      <p2:Path>Schemas\Repo\NoStimulus.yml</p2:Path>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="rx:AsyncSubject">
@@ -622,9 +676,6 @@ expects: Schemas/ .yml files</Description>
                     <Combinator xsi:type="IntProperty">
                       <Value>5</Value>
                     </Combinator>
-                  </Expression>
-                  <Expression xsi:type="rx:PublishSubject">
-                    <Name>BufferVideo</Name>
                   </Expression>
                   <Expression xsi:type="Multiply">
                     <Operand xsi:type="IntProperty">
@@ -666,18 +717,17 @@ expects: Schemas/ .yml files</Description>
                   <Edge From="3" To="4" Label="Source1" />
                   <Edge From="4" To="5" Label="Source1" />
                   <Edge From="6" To="7" Label="Source1" />
-                  <Edge From="7" To="13" Label="Source1" />
+                  <Edge From="7" To="12" Label="Source1" />
                   <Edge From="8" To="9" Label="Source1" />
                   <Edge From="9" To="10" Label="Source1" />
                   <Edge From="10" To="11" Label="Source1" />
-                  <Edge From="11" To="12" Label="Source1" />
-                  <Edge From="12" To="13" Label="Source2" />
-                  <Edge From="13" To="17" Label="Source1" />
+                  <Edge From="11" To="12" Label="Source2" />
+                  <Edge From="12" To="16" Label="Source1" />
+                  <Edge From="13" To="14" Label="Source1" />
                   <Edge From="14" To="15" Label="Source1" />
-                  <Edge From="15" To="16" Label="Source1" />
-                  <Edge From="16" To="17" Label="Source2" />
+                  <Edge From="15" To="16" Label="Source2" />
+                  <Edge From="16" To="17" Label="Source1" />
                   <Edge From="17" To="18" Label="Source1" />
-                  <Edge From="18" To="19" Label="Source1" />
                 </Edges>
               </Workflow>
             </Expression>
@@ -700,7 +750,7 @@ expects: Schemas/ .yml files</Description>
                   </Expression>
                   <Expression xsi:type="PropertySource" TypeArguments="io:GetDirectories,sys:String">
                     <MemberName>Path</MemberName>
-                    <Value>{{@navigate RawData path}}</Value>
+                    <Value>C:\Users\MF\Documents\GitHub\Bonfly\Moita-Bonfly\ExampleVideos</Value>
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:Take">
@@ -826,8 +876,8 @@ LEDRamped = Shift + R
               <Property Name="Path" DisplayName="TestVisualStim" />
             </Expression>
             <Expression xsi:type="Combinator">
-              <Combinator xsi:type="p3:LoadSettings">
-                <p3:Path>Schemas\TestStim\TestVisualStim.yml</p3:Path>
+              <Combinator xsi:type="p2:LoadSettings">
+                <p2:Path>Schemas\TestStim\TestVisualStim.yml</p2:Path>
               </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
@@ -1765,11 +1815,11 @@ LEDRamped = Shift + R
                           <ui:Text>LoomingSize</ui:Text>
                           <ui:Visible>true</ui:Visible>
                           <ui:Location>
-                            <ui:X>1200</ui:X>
-                            <ui:Y>750</ui:Y>
+                            <ui:X>1180</ui:X>
+                            <ui:Y>765</ui:Y>
                           </ui:Location>
                           <ui:Size>
-                            <ui:Width>500</ui:Width>
+                            <ui:Width>515</ui:Width>
                             <ui:Height>215</ui:Height>
                           </ui:Size>
                           <ui:WindowState xsi:nil="true" />
@@ -1872,8 +1922,8 @@ LEDRamped = Shift + R
             </Expression>
             <Expression xsi:type="Disable">
               <Builder xsi:type="Combinator">
-                <Combinator xsi:type="p3:LoadSettings">
-                  <p3:Path>Schemas\TestStim\TestLEDContinuous.yml</p3:Path>
+                <Combinator xsi:type="p2:LoadSettings">
+                  <p2:Path>Schemas\TestStim\TestLEDContinuous.yml</p2:Path>
                 </Combinator>
               </Builder>
             </Expression>
@@ -1972,7 +2022,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -1982,7 +2032,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -1992,7 +2042,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -2002,7 +2052,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -2058,7 +2108,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -2090,7 +2140,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -2177,7 +2227,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -2221,7 +2271,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -2265,7 +2315,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                     <Value>Both</Value>
                                   </Operand>
                                 </Expression>
@@ -2381,7 +2431,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -2404,7 +2454,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -2427,7 +2477,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -2450,7 +2500,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -2577,7 +2627,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -2600,7 +2650,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -2623,7 +2673,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -2646,7 +2696,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -2778,7 +2828,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -2788,7 +2838,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -2798,7 +2848,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -2808,7 +2858,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -2986,8 +3036,8 @@ LEDRamped = Shift + R
             </Expression>
             <Expression xsi:type="Disable">
               <Builder xsi:type="Combinator">
-                <Combinator xsi:type="p3:LoadSettings">
-                  <p3:Path>Schemas\TestStim\TestLEDPulsed.yml</p3:Path>
+                <Combinator xsi:type="p2:LoadSettings">
+                  <p2:Path>Schemas\TestStim\TestLEDPulsed.yml</p2:Path>
                 </Combinator>
               </Builder>
             </Expression>
@@ -3086,7 +3136,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -3096,7 +3146,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -3106,7 +3156,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -3116,7 +3166,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -3172,7 +3222,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -3204,7 +3254,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -3308,7 +3358,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -3352,7 +3402,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -3396,7 +3446,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -3529,7 +3579,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -3573,7 +3623,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -3617,7 +3667,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -3750,7 +3800,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -3794,7 +3844,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -3838,7 +3888,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -3966,7 +4016,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -3989,7 +4039,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -4012,7 +4062,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -4035,7 +4085,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -4161,7 +4211,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -4184,7 +4234,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -4207,7 +4257,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -4230,7 +4280,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -4362,7 +4412,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -4372,7 +4422,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -4382,7 +4432,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -4392,7 +4442,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -4570,8 +4620,8 @@ LEDRamped = Shift + R
             </Expression>
             <Expression xsi:type="Disable">
               <Builder xsi:type="Combinator">
-                <Combinator xsi:type="p3:LoadSettings">
-                  <p3:Path>Schemas\TestStim\TestLEDRamped.yml</p3:Path>
+                <Combinator xsi:type="p2:LoadSettings">
+                  <p2:Path>Schemas\TestStim\TestLEDRamped.yml</p2:Path>
                 </Combinator>
               </Builder>
             </Expression>
@@ -4670,7 +4720,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -4680,7 +4730,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -4690,7 +4740,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -4700,7 +4750,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -4756,7 +4806,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -4788,7 +4838,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -4877,7 +4927,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -4913,7 +4963,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -4949,7 +4999,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Both</Value>
                                   </Operand>
                                 </Expression>
@@ -5051,7 +5101,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -5074,7 +5124,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -5097,7 +5147,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -5120,7 +5170,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -5223,7 +5273,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -5310,7 +5360,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -5397,7 +5447,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Both</Value>
                                   </Operand>
                                 </Expression>
@@ -5557,7 +5607,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -5644,7 +5694,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -5731,7 +5781,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Both</Value>
                                   </Operand>
                                 </Expression>
@@ -5875,7 +5925,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -5898,7 +5948,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -5921,7 +5971,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -5944,7 +5994,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -6076,7 +6126,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -6086,7 +6136,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -6096,7 +6146,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -6106,7 +6156,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -6390,6 +6440,10 @@ LEDRamped = Shift + R
               <Selector>TimeStep.ElapsedRealTime</Selector>
             </Expression>
             <Expression xsi:type="rx:Accumulate" />
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Name />
+              <scr:Expression>TimeSpan.FromSeconds(it)</scr:Expression>
+            </Expression>
             <Expression xsi:type="rx:PublishSubject">
               <Name>SessionTimer</Name>
             </Expression>
@@ -6402,6 +6456,7 @@ LEDRamped = Shift + R
             <Edge From="3" To="4" Label="Source1" />
             <Edge From="4" To="5" Label="Source1" />
             <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
@@ -7479,7 +7534,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -7489,7 +7544,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -7499,7 +7554,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -7509,7 +7564,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -7565,7 +7620,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -7597,7 +7652,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -7684,7 +7739,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -7728,7 +7783,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -7772,7 +7827,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                     <Value>Both</Value>
                                   </Operand>
                                 </Expression>
@@ -7888,7 +7943,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -7911,7 +7966,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -7934,7 +7989,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -7957,7 +8012,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -8084,7 +8139,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -8107,7 +8162,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -8130,7 +8185,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -8153,7 +8208,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -8285,7 +8340,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -8295,7 +8350,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -8305,7 +8360,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -8315,7 +8370,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsContinuousStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsContinuousStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -8508,7 +8563,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -8518,7 +8573,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -8528,7 +8583,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -8538,7 +8593,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -8594,7 +8649,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -8626,7 +8681,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -8730,7 +8785,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -8774,7 +8829,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -8818,7 +8873,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -8951,7 +9006,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -8995,7 +9050,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -9039,7 +9094,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -9172,7 +9227,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -9216,7 +9271,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -9260,7 +9315,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -9388,7 +9443,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -9411,7 +9466,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -9434,7 +9489,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -9457,7 +9512,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -9583,7 +9638,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -9606,7 +9661,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -9629,7 +9684,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -9652,7 +9707,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -9784,7 +9839,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -9794,7 +9849,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -9804,7 +9859,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -9814,7 +9869,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsPulsedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsPulsedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -10007,7 +10062,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -10017,7 +10072,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -10027,7 +10082,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -10037,7 +10092,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -10093,7 +10148,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -10125,7 +10180,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -10214,7 +10269,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -10250,7 +10305,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -10286,7 +10341,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Both</Value>
                                   </Operand>
                                 </Expression>
@@ -10388,7 +10443,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -10411,7 +10466,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -10434,7 +10489,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -10457,7 +10512,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -10560,7 +10615,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -10647,7 +10702,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -10734,7 +10789,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Both</Value>
                                   </Operand>
                                 </Expression>
@@ -10894,7 +10949,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led0</Value>
                                   </Operand>
                                 </Expression>
@@ -10981,7 +11036,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Led1</Value>
                                   </Operand>
                                 </Expression>
@@ -11068,7 +11123,7 @@ LEDRamped = Shift + R
                                   <Selector>LedTarget</Selector>
                                 </Expression>
                                 <Expression xsi:type="Equal">
-                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                  <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                     <Value>Both</Value>
                                   </Operand>
                                 </Expression>
@@ -11212,7 +11267,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -11235,7 +11290,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -11258,7 +11313,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -11281,7 +11336,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -11413,7 +11468,7 @@ LEDRamped = Shift + R
                                         <Selector>LedTarget</Selector>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>None</Value>
                                         </Operand>
                                       </Expression>
@@ -11423,7 +11478,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led0</Value>
                                         </Operand>
                                       </Expression>
@@ -11433,7 +11488,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Led1</Value>
                                         </Operand>
                                       </Expression>
@@ -11443,7 +11498,7 @@ LEDRamped = Shift + R
                                         </Combinator>
                                       </Expression>
                                       <Expression xsi:type="Equal">
-                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p4:OptogeneticsRampedStimuliLedTarget">
+                                        <Operand xsi:type="WorkflowProperty" TypeArguments="p3:OptogeneticsRampedStimuliLedTarget">
                                           <Value>Both</Value>
                                         </Operand>
                                       </Expression>
@@ -11990,38 +12045,9 @@ LEDRamped = Shift + R
       </Expression>
     </Nodes>
     <Edges>
-      <Edge From="0" To="1" Label="Source1" />
       <Edge From="1" To="2" Label="Source1" />
-      <Edge From="3" To="4" Label="Source1" />
       <Edge From="4" To="5" Label="Source1" />
-      <Edge From="5" To="6" Label="Source1" />
-      <Edge From="6" To="7" Label="Source1" />
-      <Edge From="7" To="8" Label="Source1" />
-      <Edge From="9" To="10" Label="Source1" />
-      <Edge From="10" To="24" Label="Source1" />
       <Edge From="11" To="12" Label="Source1" />
-      <Edge From="11" To="14" Label="Source1" />
-      <Edge From="12" To="13" Label="Source1" />
-      <Edge From="13" To="24" Label="Source2" />
-      <Edge From="14" To="15" Label="Source1" />
-      <Edge From="15" To="24" Label="Source3" />
-      <Edge From="16" To="17" Label="Source1" />
-      <Edge From="17" To="24" Label="Source4" />
-      <Edge From="18" To="19" Label="Source1" />
-      <Edge From="19" To="24" Label="Source5" />
-      <Edge From="20" To="21" Label="Source1" />
-      <Edge From="21" To="24" Label="Source6" />
-      <Edge From="22" To="23" Label="Source1" />
-      <Edge From="23" To="24" Label="Source7" />
-      <Edge From="24" To="25" Label="Source1" />
-      <Edge From="26" To="27" Label="Source1" />
-      <Edge From="27" To="30" Label="Source1" />
-      <Edge From="28" To="29" Label="Source1" />
-      <Edge From="29" To="30" Label="Source2" />
-      <Edge From="30" To="31" Label="Source1" />
-      <Edge From="32" To="33" Label="Source1" />
-      <Edge From="35" To="36" Label="Source1" />
-      <Edge From="42" To="43" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
