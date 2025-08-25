@@ -13,6 +13,9 @@
                  xmlns:sys="clr-namespace:System;assembly=mscorlib"
                  xmlns:wie="clr-namespace:Bonsai.Windows.Input;assembly=Bonsai.Windows.Input"
                  xmlns:dsp="clr-namespace:Bonsai.Dsp;assembly=Bonsai.Dsp"
+                 xmlns:ui="clr-namespace:Bonsai.Design;assembly=Bonsai.Design"
+                 xmlns:viz="clr-namespace:Bonsai.Design.Visualizers;assembly=Bonsai.Design.Visualizers"
+                 xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
                  xmlns:p3="clr-namespace:AutomaticGenerators;assembly=Extensions"
                  xmlns:cv="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision"
                  xmlns="https://bonsai-rx.org/2018/workflow">
@@ -20,12 +23,47 @@
     <Nodes>
       <Expression xsi:type="Annotation">
         <Name>README</Name>
-        <Text><![CDATA[# FlyHigherProtocol
+        <Text><![CDATA[# FlyHigher
+## Protocol
+
+Click on parameters for detailed descriptions.
+
+🪰 Standard values  
+♫ Notes  
+⚠ Warnings  
+
+---
+
+### Before experiment
+1. Set experiment parameters (click on **Settings** for extended parameters)  
+2. Start Bonsai (**Start / F5**)  
+3. Check camera binding (**Door**, **Back**)  
+4. Test the stimulus type to be used  
+   ♫ Ensure it renders properly **and** is read on GPIO  
+
+---
+
+### ⚠ Warnings
+- Do **not** click on anything while the experiment is running → causes a screen flicker that mimics a lights-off stimulus  
+- Always start by **testing your stimuli** → this sets LED parameters and ensures the photodiode is aligned  
+- LED intensity varies across setups → **never** reuse the same Opto schema across setups  
+- Do not include empty arenas when running <4 flies → delete videos with 0 arenas after the run  
+
+---
+
+
+__( · )<&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Start experiment:**  
+\\ _ )&nbsp;&nbsp;)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**→ press *Space* to begin.**
+
+---
+
+
+
+
 ]]></Text>
       </Expression>
       <Expression xsi:type="ExternalizedMapping">
         <Property Name="⚠ LED - COM Port" />
-        <Property Name="⚠ LED - IR Intensity" />
         <Property Name="⚠ CamA (Door) - SerialNumber" />
         <Property Name="⚠ CamB (Back) - SerialNumber" />
         <Property Name="⚠ Stimulation Screen" />
@@ -43,21 +81,29 @@
       </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>Settings</Name>
+        <Description>Experiment settings, from hardware to experimental design, and logging.
+⚠ Params starting with ⚠ are unique to each setup.</Description>
         <Workflow>
           <Nodes>
             <Expression xsi:type="ExternalizedMapping">
               <Property Name="⚠ LED - COM Port" />
-              <Property Name="⚠ LED - IR Intensity" />
+              <Property Name="LED - IR Intensity" />
             </Expression>
             <Expression xsi:type="GroupWorkflow">
               <Name>LEDboardSettings</Name>
+              <Description>COM Port — Define the serial port used to communicate with the LED board.
+⚠ Unique to each setup (check OS device list).
+♫ If wrong, stimuli won’t trigger.
+
+Infrared Intensity — Set IR level (a.u. 1–120).
+🪰 100</Description>
               <Workflow>
                 <Nodes>
                   <Expression xsi:type="rx:BehaviorSubject" TypeArguments="harp:HarpMessage">
                     <rx:Name>LedBoardCommands</rx:Name>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="PortName" DisplayName="⚠ LED - COM Port" Description="⚠⚠⚠ COM PORT IS SETUP SENSITIVE ⚠⚠⚠&#xD;&#xA;&#xD;&#xA;The COM Port where the Harp Board is plugged in.&#xD;&#xA;&#xD;&#xA;@navigate [v]&#xD;&#xA;e.g. COM7" Category="1. Hardware Config" />
+                    <Property Name="PortName" DisplayName="⚠ LED - COM Port" Description="Serial communication port used by the LED array controller.&#xD;&#xA;⚠ Must match the actual COM port of the LED board.&#xD;&#xA;♫ If wrong, the LED won’t respond.&#xD;&#xA;♫ Typical format: COM7" Category="1. Hardware Config" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="harp:Device">
@@ -75,7 +121,7 @@
                   </Expression>
                   <Expression xsi:type="WorkflowOutput" />
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName="⚠ LED - IR Intensity" Description="⚠⚠⚠ IR INTENSITIES ARE SETUP SENSITIVE ⚠⚠⚠&#xD;&#xA;&#xD;&#xA;Intensity of the IR LEDs.&#xD;&#xA;&#xD;&#xA;@type: int&#xD;&#xA;e.g. 60&#xD;&#xA;&#xD;&#xA;☑ FH0 = 60  |  FH1 = 100  |  FH2 = 88  |  FH3 = 60&#xD;&#xA;☑ Last defined: 12-08-2025" Category="1. Hardware Config" />
+                    <Property Name="Value" DisplayName="LED - IR Intensity" Description="Sets the infrared LED brightness in arbitrary units (1–120).&#xD;&#xA;🪰 100 a.u.&#xD;&#xA;♫ Adjust only if hardware differs; Tracking is sensitive to changes." Category="1. Hardware Config" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="IntProperty">
@@ -128,15 +174,18 @@
             </Expression>
             <Expression xsi:type="GroupWorkflow">
               <Name>CameraSettings</Name>
+              <Description>Camera Identification — Cameras (“Door” and “Back”) are bound by serial number.
+⚠ Serial numbers are unique to each camera.
+♫ If swapped, views will be wrong, check before recording.</Description>
               <Workflow>
                 <Nodes>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="SerialNumber" DisplayName="⚠ CamA (Door) - SerialNumber" Description="Serial number of the camera close to the door&#xD;&#xA;&#xD;&#xA;@select [v]&#xD;&#xA;e.g. 4563758&#xD;&#xA;&#xD;&#xA;⚠ check if camera matches prediction (door, back)&#xD;&#xA;" Category="1. Hardware Config" />
+                    <Property Name="SerialNumber" DisplayName="⚠ CamA (Door) - SerialNumber" Description="Unique CameraA SN used to bind the “Door” camera. &#xD;&#xA;⚠ Must match the actual serial number of the device. &#xD;&#xA;♫ If wrong, Bonsai may bind the wrong camera or fail to connect. &#xD;&#xA;♫ Verify before recording, mis-assigned IDs will swap arenas. &#xD;&#xA;" Category="1. Hardware Config" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="spk:SpinnakerCapture">
                       <spk:Index xsi:nil="true" />
-                      <spk:SerialNumber>{{@dropdown Cam A SN}}</spk:SerialNumber>
+                      <spk:SerialNumber>{{@dropdown CamA SN}}</spk:SerialNumber>
                       <spk:ColorProcessing>Default</spk:ColorProcessing>
                     </Combinator>
                   </Expression>
@@ -150,12 +199,12 @@ It.ChunkData.Timestamp as Timestamp
 )</scr:Expression>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="SerialNumber" DisplayName="⚠ CamB (Back) - SerialNumber" Description="Serial number of the camera in the back&#xD;&#xA;&#xD;&#xA;@select [v]&#xD;&#xA;e.g. 4563758&#xD;&#xA;&#xD;&#xA;⚠ check if camera matches prediction (door, back)&#xD;&#xA;" Category="1. Hardware Config" />
+                    <Property Name="SerialNumber" DisplayName="⚠ CamB (Back) - SerialNumber" Description="Unique CameraB SN used to bind the “Back” camera. &#xD;&#xA;⚠ Must match the actual serial number of the device. &#xD;&#xA;♫ If wrong, Bonsai may bind the wrong camera or fail to connect. &#xD;&#xA;♫ Verify before recording, mis-assigned IDs will swap arenas. &#xD;&#xA;" Category="1. Hardware Config" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="spk:SpinnakerCapture">
                       <spk:Index xsi:nil="true" />
-                      <spk:SerialNumber>{{@dropdown Cam B SN}}</spk:SerialNumber>
+                      <spk:SerialNumber>{{@dropdown CamB SN}}</spk:SerialNumber>
                       <spk:ColorProcessing>Default</spk:ColorProcessing>
                     </Combinator>
                   </Expression>
@@ -199,23 +248,33 @@ Item2 as CamB
             <Expression xsi:type="ExternalizedMapping">
               <Property Name="⚠ Stimulation Screen" />
               <Property Name="Background color" />
-              <Property Name="TargetRenderFrequency" />
-              <Property Name="Width" />
-              <Property Name="Height" />
+              <Property Name="Monitor Refresh Rate" />
+              <Property Name="Monitor Width" />
+              <Property Name="Monitor Height" />
               <Property Name="Color Logic" />
               <Property Name="Square Y Position" />
               <Property Name="Square X Position" />
+              <Property Name="Square Width" />
+              <Property Name="Square Height" />
             </Expression>
             <Expression xsi:type="GroupWorkflow">
               <Name>ScreenSettings</Name>
+              <Description>Stimulation Screen — Select the display used for visual stimuli.
+⚠ Unique per setup (monitor ID/position).
+
+Photodiode Properties — Color logic, size, and position of the photodiode patch.
+♫ Used for video-stimuli alignment; ensure it’s visible to the diode.
+
+Stimulation Screen Settings — Default color, size, and render frequency.
+♫ If stimulus background RGBA = 0, this setting defines the visible background.</Description>
               <Workflow>
                 <Nodes>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="DisplayDevice" DisplayName="⚠ Stimulation Screen" Description="Select the monitor to render Visual Stimuli.&#xD;&#xA;&#xD;&#xA;@navigate [v]&#xD;&#xA;e.g. First" Category="1. Hardware Config" />
-                    <Property Name="ClearColor" DisplayName="Background color" Description="Set background color of the stimulation screen.&#xD;&#xA;&#xD;&#xA;@navigate [v]&#xD;&#xA;&#xD;&#xA;☑ if visual stim background color alpha parameter is set to 1, the screen will decide background color." Category="Stimulation Screen Settings" />
-                    <Property Name="TargetRenderFrequency" Category="Stimulation Screen Settings" />
-                    <Property Name="Width" Description="in pixels" Category="Stimulation Screen Settings" />
-                    <Property Name="Height" Description="in pixels" Category="Stimulation Screen Settings" />
+                    <Property Name="DisplayDevice" DisplayName="⚠ Stimulation Screen" Description="Monitor/display used for stimulus presentation.&#xD;&#xA;⚠ Must match the correct display ID on each setup (e.g. First).&#xD;&#xA;♫ If wrong, stimuli will appear on the wrong screen." Category="1. Hardware Config" />
+                    <Property Name="ClearColor" DisplayName="Background color" Description="Default background color for the stimulus window.&#xD;&#xA;♫ If stimulus schema RGBA values are set to 0, the screen’s default fill color will show." Category="Stimulation Screen Settings" />
+                    <Property Name="TargetRenderFrequency" DisplayName="Monitor Refresh Rate" Description="Refresh frequency (Hz) for rendering stimuli.&#xD;&#xA;🪰 240 Hz&#xD;&#xA;⚠ Must match the physical monitor refresh rate (e.g. 240 Hz).&#xD;&#xA;♫ Mismatched frequencies can cause frame judder or timing inaccuracies." Category="Stimulation Screen Settings" />
+                    <Property Name="Width" DisplayName="Monitor Width" Description="Width of the stimulation window in pixels.&#xD;&#xA;🪰 1920 px&#xD;&#xA;⚠ Must match the correct display resolution.&#xD;&#xA;♫ Mismatched size will cause unexpected stimulus size rendering." Category="Stimulation Screen Settings" />
+                    <Property Name="Height" DisplayName="Monitor Height" Description="Height of the stimulation window in pixels.&#xD;&#xA;🪰 1080 px&#xD;&#xA;⚠ Must match the correct display resolution.&#xD;&#xA;♫ Mismatched size will cause unexpected stimulus size rendering." Category="Stimulation Screen Settings" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="gl:CreateWindow">
@@ -229,7 +288,7 @@ Item2 as CamB
                       <gl:Location xsi:nil="true" />
                       <gl:WindowBorder>Hidden</gl:WindowBorder>
                       <gl:WindowState>Maximized</gl:WindowState>
-                      <gl:DisplayDevice>Second</gl:DisplayDevice>
+                      <gl:DisplayDevice>First</gl:DisplayDevice>
                       <gl:TargetRenderFrequency>240</gl:TargetRenderFrequency>
                       <gl:TargetUpdateFrequency xsi:nil="true" />
                       <gl:RenderState />
@@ -307,7 +366,7 @@ Item2 as CamB
                     <Name>SyncState</Name>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Expression" DisplayName="Color Logic" Description="Logic applied to decide the color of the photodiode indicator." Category="Photodiode Properties" />
+                    <Property Name="Expression" DisplayName="Color Logic" Description="Defines ON/OFF color values for the photodiode square, used for video-stimulus synchronization.&#xD;&#xA;🪰 it ? 0 : 1&#xD;&#xA;i.e. when stimulus is ON, square is black, else white." Category="Photodiode Properties" />
                   </Expression>
                   <Expression xsi:type="scr:ExpressionTransform">
                     <scr:Expression>it ? 0 : 1</scr:Expression>
@@ -320,7 +379,7 @@ Item2 as CamB
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName="Square Y Position" Description="Position of the photodiode indicator along the Height of the monitor. 1: Up, -1: Bottom" Category="Photodiode Properties" />
+                    <Property Name="Value" DisplayName="Square Y Position" Description="Vertical offset of the photodiode square.&#xD;&#xA;Normalized -1(bottom) to 1(top) coordinates.&#xD;&#xA;🪰 1, i.e. top-right corner." Category="Photodiode Properties" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="FloatProperty">
@@ -336,7 +395,7 @@ Item2 as CamB
                     </PropertyMappings>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName="Square X Position" Description="Position of the photodiode indicator along the Width of the monitor. 1: Right, -1: Left" Category="Photodiode Properties" />
+                    <Property Name="Value" DisplayName="Square X Position" Description="Horizontal offset of the photodiode square.&#xD;&#xA;Normalized -1(left) to 1(right) coordinates.&#xD;&#xA;🪰 1; i.e. top-right corner." Category="Photodiode Properties" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="FloatProperty">
@@ -350,6 +409,10 @@ Item2 as CamB
                     <PropertyMappings>
                       <Property Name="LocationX" />
                     </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="ExtentX" DisplayName="Square Width" Description="Width of the photodiode square.&#xD;&#xA;🪰 2&#xD;&#xA;♫ Should be large enough for reliable diode detection but small enough not to occupy too much the monitor." Category="Photodiode Properties" />
+                    <Property Name="ExtentY" DisplayName="Square Height" Description="Width of the photodiode square.&#xD;&#xA;🪰 2&#xD;&#xA;♫ Should be large enough for reliable diode detection but small enough not to occupy too much the monitor." Category="Photodiode Properties" />
                   </Expression>
                   <Expression xsi:type="IncludeWorkflow" Path="BonVision:Primitives.DrawQuad.bonsai">
                     <ExtentX>2</ExtentX>
@@ -375,19 +438,20 @@ Item2 as CamB
                   <Edge From="9" To="10" Label="Source1" />
                   <Edge From="10" To="11" Label="Source1" />
                   <Edge From="12" To="13" Label="Source1" />
-                  <Edge From="14" To="27" Label="Source1" />
+                  <Edge From="14" To="28" Label="Source1" />
                   <Edge From="15" To="17" Label="Source1" />
                   <Edge From="16" To="17" Label="Source2" />
                   <Edge From="17" To="18" Label="Source1" />
-                  <Edge From="18" To="27" Label="Source2" />
+                  <Edge From="18" To="28" Label="Source2" />
                   <Edge From="19" To="20" Label="Source1" />
                   <Edge From="20" To="21" Label="Source1" />
                   <Edge From="21" To="22" Label="Source1" />
-                  <Edge From="22" To="27" Label="Source3" />
+                  <Edge From="22" To="28" Label="Source3" />
                   <Edge From="23" To="24" Label="Source1" />
                   <Edge From="24" To="25" Label="Source1" />
                   <Edge From="25" To="26" Label="Source1" />
-                  <Edge From="26" To="27" Label="Source4" />
+                  <Edge From="26" To="28" Label="Source4" />
+                  <Edge From="27" To="28" Label="Source5" />
                 </Edges>
               </Workflow>
             </Expression>
@@ -400,13 +464,29 @@ Item2 as CamB
             </Expression>
             <Expression xsi:type="GroupWorkflow">
               <Name>ExperimentSettings</Name>
-              <Description>Experimental stimuli parameters
-
-expects: Schemas/ .yml files</Description>
+              <Description>Experimental Parameters — Stimulus schema, total duration, and sampling rate.
+⚠ OptoSchema is unique to each setup.
+⚠ SamplingRate = expected camera FPS; doesn't affect camera config.</Description>
               <Workflow>
                 <Nodes>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Path" DisplayName="⚠ Schema - OptoStim" Description="⚠⚠⚠ LED INTENSITIES ARE SETUP SENSITIVE ⚠⚠⚠&#xD;&#xA;&#xD;&#xA;Path to the .yml file with the LED parameters for optogenetics.&#xD;&#xA;&#xD;&#xA;@navigate to file [...]&#xD;&#xA;e.g. .../ExpFolder/Bonfly/src/Schemas/OptoLadder.yml&#xD;&#xA;&#xD;&#xA;☑ if no LED stimulation use: Schemas/Repo/NoStimulus.yml" Category="2. Experiment Design" />
+                    <Property Name="Value" DisplayName=".BufferVideo" Description="Adds time, in seconds, both at the start and end of the experiment duration.&#xD;&#xA;🪰 5 sec&#xD;&#xA;♫ Recording time = ExperimentDuration * SamplingRate + (BufferVideo * 2)" Category="2. Experiment Design" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="IntProperty">
+                      <Value>5</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:BehaviorSubject">
+                    <Name>BufferVideo</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Path" DisplayName="⚠ Schema - OptoStim" Description="Schema design for optogenetic stimulation.&#xD;&#xA;⚠ If not used in experiment, select: Schemas\Repo\NoStimulus.yml&#xD;&#xA;⚠ Unique to each setup; Intensity values vary.&#xD;&#xA;♫ Check Schemas\Repo folder for commonly used protocols.&#xD;&#xA;♫ Check Schemas\Examples\ExampleOptoStim.yml for example and tutorial stimulus design." Category="2. Experiment Design" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="p2:LoadSettings">
@@ -417,7 +497,7 @@ expects: Schemas/ .yml files</Description>
                     <Name>OptoStimuliSettings</Name>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Path" DisplayName="Schema - VisualStim" Description="Path to the .yml file with the rendering parameters for visual stimulation.&#xD;&#xA;&#xD;&#xA;@navigate to file [...]&#xD;&#xA;e.g. .../ExpFolder/Bonfly/src/Schemas/20Loom.yml&#xD;&#xA;&#xD;&#xA;☑ if no LED stimulation use: Schemas/Repo/NoStimulus.yml" Category="2. Experiment Design" />
+                    <Property Name="Path" DisplayName="Schema - VisualStim" Description="Schema for visual stimulus presentation.&#xD;&#xA;⚠ If not used in experiment, select: Schemas\Repo\NoStimulus.yml&#xD;&#xA;♫ Shared across setups, but version mismatches can break reproducibility.&#xD;&#xA;♫ Check Schemas\Repo folder for commonly used protocols.&#xD;&#xA;♫ Check Schemas\Examples\ExampleVisualStim.yml for example and tutorial stimulus design." Category="2. Experiment Design" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="p2:LoadSettings">
@@ -428,22 +508,14 @@ expects: Schemas/ .yml files</Description>
                     <Name>VisualStimuliSettings</Name>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName=".Experiment Duration" Description="Duration of the experiment in seconds &#xD;&#xA;&#xD;&#xA;This is used to time data acquisition&#xD;&#xA;(DataLength = FrameRate * ExpDuration)&#xD;&#xA;&#xD;&#xA;@type: int (sec)&#xD;&#xA;&#xD;&#xA;⚠ acquisition will last for 10 more seconds" Category="2. Experiment Design" />
+                    <Property Name="Value" DisplayName=".Experiment Duration" Description="Total duration of the experiment (seconds).&#xD;&#xA;♫ Recording time = ExperimentDuration * SamplingRate + (BufferVideo * 2)" Category="2. Experiment Design" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="IntProperty">
                       <Value>600</Value>
                     </Combinator>
                   </Expression>
-                  <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName=".BufferVideo" Category="2. Experiment Design" />
-                  </Expression>
-                  <Expression xsi:type="Combinator">
-                    <Combinator xsi:type="IntProperty">
-                      <Value>5</Value>
-                    </Combinator>
-                  </Expression>
-                  <Expression xsi:type="rx:PublishSubject">
+                  <Expression xsi:type="SubscribeSubject">
                     <Name>BufferVideo</Name>
                   </Expression>
                   <Expression xsi:type="Multiply">
@@ -462,14 +534,14 @@ expects: Schemas/ .yml files</Description>
                     </Operand>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName=".Sampling Rate" Description="Cameras Frame Rate&#xD;&#xA;&#xD;&#xA;This is used to time data acquisition&#xD;&#xA;(DataLength = FrameRate * ExpDuration)&#xD;&#xA;&#xD;&#xA;@type: int (Hz)&#xD;&#xA;&#xD;&#xA;☑ expected to be the same as camera acquisition&#xD;&#xA;⚠ expected to match across cameras" Category="2. Experiment Design" />
+                    <Property Name="Value" DisplayName=".Sampling Rate" Description="Expected camera acquisition frame rate (Hz). Used for experiment duration, and logging frame rate.&#xD;&#xA;🪰 60 Hz.&#xD;&#xA;⚠ Must match the actual camera FPS; Doesn’t change camera config.&#xD;&#xA;♫ Recording time = ExperimentDuration * SamplingRate + (BufferVideo * 2)" Category="2. Experiment Design" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="IntProperty">
                       <Value>60</Value>
                     </Combinator>
                   </Expression>
-                  <Expression xsi:type="rx:PublishSubject">
+                  <Expression xsi:type="rx:BehaviorSubject">
                     <Name>SamplingRate</Name>
                   </Expression>
                   <Expression xsi:type="Combinator">
@@ -483,21 +555,22 @@ expects: Schemas/ .yml files</Description>
                 <Edges>
                   <Edge From="0" To="1" Label="Source1" />
                   <Edge From="1" To="2" Label="Source1" />
-                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
                   <Edge From="4" To="5" Label="Source1" />
-                  <Edge From="6" To="7" Label="Source1" />
-                  <Edge From="7" To="13" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="7" To="8" Label="Source1" />
                   <Edge From="8" To="9" Label="Source1" />
-                  <Edge From="9" To="10" Label="Source1" />
                   <Edge From="10" To="11" Label="Source1" />
-                  <Edge From="11" To="12" Label="Source1" />
-                  <Edge From="12" To="13" Label="Source2" />
-                  <Edge From="13" To="17" Label="Source1" />
-                  <Edge From="14" To="15" Label="Source1" />
-                  <Edge From="15" To="16" Label="Source1" />
-                  <Edge From="16" To="17" Label="Source2" />
+                  <Edge From="11" To="15" Label="Source1" />
+                  <Edge From="12" To="13" Label="Source1" />
+                  <Edge From="13" To="14" Label="Source1" />
+                  <Edge From="14" To="15" Label="Source2" />
+                  <Edge From="15" To="19" Label="Source1" />
+                  <Edge From="16" To="17" Label="Source1" />
                   <Edge From="17" To="18" Label="Source1" />
-                  <Edge From="18" To="19" Label="Source1" />
+                  <Edge From="18" To="19" Label="Source2" />
+                  <Edge From="19" To="20" Label="Source1" />
+                  <Edge From="20" To="21" Label="Source1" />
                 </Edges>
               </Workflow>
             </Expression>
@@ -512,15 +585,17 @@ expects: Schemas/ .yml files</Description>
             </Expression>
             <Expression xsi:type="GroupWorkflow">
               <Name>FilenameSettings</Name>
-              <Description>Used to generate filenames</Description>
+              <Description>Standard Filename Structure — Defines save path and naming pattern.
+...\ExperimentFolder\RawData\[Experimenter]-[Genotype]-[Protocol]-[Sex]-[Age]-[Setup]-[Camera]-[Timestamp]
+♫ Include experimenter ID, fly parameters, protocol used, camera tags, and timestamp for traceability.</Description>
               <Workflow>
                 <Nodes>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName="0. Save Folder" Description="Path to the folder where to save the data.&#xD;&#xA;&#xD;&#xA;@navigate to path [...]&#xD;&#xA;e.g. .../ExpFolder/RawData&#xD;&#xA;&#xD;&#xA;☑ convention: /RawData" Category="3. Filename Generator" />
+                    <Property Name="Value" DisplayName="0. Save Folder" Description="Directory path where experiment data will be stored.&#xD;&#xA;🪰 ...\ExpFolder\RawData" Category="3. Filename Generator" />
                   </Expression>
                   <Expression xsi:type="PropertySource" TypeArguments="io:GetDirectories,sys:String">
                     <MemberName>Path</MemberName>
-                    <Value>{{@navigate RawData path}}</Value>
+                    <Value>{{@navigate RawData folder}}</Value>
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="rx:Take">
@@ -531,7 +606,7 @@ expects: Schemas/ .yml files</Description>
                     <Name>RootPath</Name>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName="1. Experimenter" Description="Initials of the Experimenter&#xD;&#xA;&#xD;&#xA; @type: str&#xD;&#xA;e.g. FH0" Category="3. Filename Generator" />
+                    <Property Name="Value" DisplayName="1. Experimenter" Description="Identifier for the person running the experiment.&#xD;&#xA;🪰 Initials (e.g. JDS)" Category="3. Filename Generator" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="StringProperty">
@@ -539,15 +614,15 @@ expects: Schemas/ .yml files</Description>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName="2. Genotype" Description="Fly line genotype&#xD;&#xA;&#xD;&#xA;@type: str (user label)&#xD;&#xA;e.g. EmptySplitGal4_X_UASTNT" Category="3. Filename Generator" />
+                    <Property Name="Value" DisplayName="2. Genotype" Description="Fly line or genotype identifier.&#xD;&#xA;♫ Essential for grouping and downstream analysis." Category="3. Filename Generator" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="StringProperty">
-                      <Value>GENO</Value>
+                      <Value>GENOTYPE</Value>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName="3. Protocol" Description="Protocol/Treatment tested.&#xD;&#xA;&#xD;&#xA;@type: str (user label)&#xD;&#xA;e.g. 20Loom_25cm_s" Category="3. Filename Generator" />
+                    <Property Name="Value" DisplayName="3. Protocol" Description="Protocol identifier of the stimulation schema used.&#xD;&#xA;♫ Essential for grouping and downstream analysis." Category="3. Filename Generator" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="StringProperty">
@@ -555,7 +630,7 @@ expects: Schemas/ .yml files</Description>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName="4. Sex" Description="Sex of the flies.&#xD;&#xA;&#xD;&#xA;@type: str&#xD;&#xA;e.g. Female" Category="3. Filename Generator" />
+                    <Property Name="Value" DisplayName="4. Sex" Description="Sex of the experimental subject(s).&#xD;&#xA;🪰 Male, Female" Category="3. Filename Generator" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="StringProperty">
@@ -563,7 +638,7 @@ expects: Schemas/ .yml files</Description>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName="5. Age" Description="Age of the flies&#xD;&#xA;&#xD;&#xA;@type: str (days from eclosion)&#xD;&#xA;e.g. 3days; 3to5days&#xD;&#xA;&#xD;&#xA;☑ convention: Xdays&#xD;&#xA;☑ age interval convention: XtoXdays&#xD;&#xA;" Category="3. Filename Generator" />
+                    <Property Name="Value" DisplayName="5. Age" Description="Age of flies at the time of experiment (days post-eclosion).&#xD;&#xA;🪰 3days; 2to6days" Category="3. Filename Generator" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="StringProperty">
@@ -571,7 +646,7 @@ expects: Schemas/ .yml files</Description>
                     </Combinator>
                   </Expression>
                   <Expression xsi:type="ExternalizedMapping">
-                    <Property Name="Value" DisplayName="6. FH Setup" Description="Experimental Setup used.&#xD;&#xA;&#xD;&#xA; @type: str&#xD;&#xA;e.g. FH0" Category="3. Filename Generator" />
+                    <Property Name="Value" DisplayName="6. FH Setup" Description="Identifier for the specific FlyHigher setup used.&#xD;&#xA;🪰 FH0" Category="3. Filename Generator" />
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="StringProperty">
@@ -633,8 +708,7 @@ expects: Schemas/ .yml files</Description>
       </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>TestStimuli</Name>
-        <Description>Test stimulus commands:
-
+        <Description>⚠ Don't stare to high intensity LEDs, will burn your retina!
 VisualStimulus = Shift + V
 LEDContinuous = Shift + C
 LEDPulsed = Shift + P
@@ -643,7 +717,7 @@ LEDRamped = Shift + R
         <Workflow>
           <Nodes>
             <Expression xsi:type="ExternalizedMapping">
-              <Property Name="Path" DisplayName="TestVisualStim" />
+              <Property Name="Path" DisplayName="TestVisualStim" Description="Shift + V&#xD;&#xA;Expects: Schemas\TestStim\TestVisualStim.yml" />
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:LoadSettings">
@@ -1549,14 +1623,50 @@ LEDRamped = Shift + R
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="rx:BufferCount">
-                            <rx:Count>24</rx:Count>
-                            <rx:Skip>24</rx:Skip>
+                            <rx:Count>10</rx:Count>
+                            <rx:Skip>10</rx:Skip>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Index">
                           <Operand xsi:type="IntProperty">
                             <Value>0</Value>
                           </Operand>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:Take">
+                            <rx:Count>13</rx:Count>
+                          </Combinator>
+                        </Expression>
+                        <Expression xsi:type="VisualizerMapping">
+                          <VisualizerType xsi:type="TypeMapping" TypeArguments="ui:ObjectTextVisualizer" />
+                        </Expression>
+                        <Expression xsi:type="VisualizerMapping">
+                          <VisualizerType xsi:type="TypeMapping" TypeArguments="viz:TimeSeriesVisualizer" />
+                        </Expression>
+                        <Expression xsi:type="gui:TableLayoutPanelBuilder">
+                          <gui:Enabled>true</gui:Enabled>
+                          <gui:Visible>true</gui:Visible>
+                          <gui:ColumnCount>8</gui:ColumnCount>
+                          <gui:RowCount>1</gui:RowCount>
+                          <gui:ColumnStyles />
+                          <gui:RowStyles />
+                          <gui:CellSpans>
+                            <gui:CellSpan ColumnSpan="1" RowSpan="1" />
+                            <gui:CellSpan ColumnSpan="7" RowSpan="1" />
+                          </gui:CellSpans>
+                        </Expression>
+                        <Expression xsi:type="ui:VisualizerWindow">
+                          <ui:Text>LoomingSize</ui:Text>
+                          <ui:Visible>true</ui:Visible>
+                          <ui:Location>
+                            <ui:X>1280</ui:X>
+                            <ui:Y>805</ui:Y>
+                          </ui:Location>
+                          <ui:Size>
+                            <ui:Width>600</ui:Width>
+                            <ui:Height>225</ui:Height>
+                          </ui:Size>
+                          <ui:WindowState>Normal</ui:WindowState>
                         </Expression>
                       </Nodes>
                       <Edges>
@@ -1596,7 +1706,13 @@ LEDRamped = Shift + R
                         <Edge From="35" To="36" Label="Source1" />
                         <Edge From="36" To="37" Label="Source1" />
                         <Edge From="38" To="39" Label="Source1" />
+                        <Edge From="38" To="43" Label="Source1" />
                         <Edge From="39" To="40" Label="Source1" />
+                        <Edge From="40" To="41" Label="Source1" />
+                        <Edge From="41" To="42" Label="Source1" />
+                        <Edge From="42" To="44" Label="Source1" />
+                        <Edge From="43" To="44" Label="Source2" />
+                        <Edge From="44" To="45" Label="Source1" />
                       </Edges>
                     </Workflow>
                   </Expression>
@@ -1644,7 +1760,7 @@ LEDRamped = Shift + R
               <Combinator xsi:type="rx:Repeat" />
             </Expression>
             <Expression xsi:type="ExternalizedMapping">
-              <Property Name="Path" DisplayName="TestLEDContinuous" />
+              <Property Name="Path" DisplayName="TestLEDContinuous" Description="Shift + C&#xD;&#xA;Expects: Schemas\TestStim\TestLEDContinuous.yml&#xD;&#xA;" />
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:LoadSettings">
@@ -2738,7 +2854,7 @@ LEDRamped = Shift + R
               <Combinator xsi:type="rx:Repeat" />
             </Expression>
             <Expression xsi:type="ExternalizedMapping">
-              <Property Name="Path" DisplayName="TestLEDPulsed" />
+              <Property Name="Path" DisplayName="TestLEDPulsed" Description="Shift + P&#xD;&#xA;Expects: Schemas\TestStim\TestLEDPulsed.yml&#xD;&#xA;" />
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:LoadSettings">
@@ -2747,7 +2863,7 @@ LEDRamped = Shift + R
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="wie:KeyDown">
-                <wie:Filter>LButton MButton XButton1 A D E Shift Control</wie:Filter>
+                <wie:Filter>ShiftKey P Shift</wie:Filter>
                 <wie:SuppressRepetitions>false</wie:SuppressRepetitions>
               </Combinator>
             </Expression>
@@ -4242,7 +4358,7 @@ LEDRamped = Shift + R
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="gl:Timer">
-                            <gl:DueTime>PT2S</gl:DueTime>
+                            <gl:DueTime>PT1S</gl:DueTime>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
@@ -4302,7 +4418,7 @@ LEDRamped = Shift + R
               <Combinator xsi:type="rx:Repeat" />
             </Expression>
             <Expression xsi:type="ExternalizedMapping">
-              <Property Name="Path" DisplayName="TestLEDRamped" />
+              <Property Name="Path" DisplayName="TestLEDRamped" Description="Shift + R&#xD;&#xA;Expects: Schemas\TestStim\TestLEDRamped.yml" />
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="p2:LoadSettings">
@@ -4907,7 +5023,7 @@ LEDRamped = Shift + R
                               </Expression>
                               <Expression xsi:type="Combinator">
                                 <Combinator xsi:type="IntProperty">
-                                  <Value>1</Value>
+                                  <Value>2</Value>
                                 </Combinator>
                               </Expression>
                               <Expression xsi:type="harp:Format">
@@ -5002,9 +5118,9 @@ LEDRamped = Shift + R
                                       </PropertyMappings>
                                     </Expression>
                                     <Expression xsi:type="IncludeWorkflow" Path="BonVision:Primitives.RangeAnimation.bonsai">
-                                      <Duration>5</Duration>
+                                      <Duration>1</Duration>
                                       <RangeBegin>1</RangeBegin>
-                                      <RangeEnd>8</RangeEnd>
+                                      <RangeEnd>10</RangeEnd>
                                     </Expression>
                                     <Expression xsi:type="WorkflowOutput" />
                                   </Nodes>
@@ -5091,7 +5207,7 @@ LEDRamped = Shift + R
                                     <Expression xsi:type="IncludeWorkflow" Path="BonVision:Primitives.RangeAnimation.bonsai">
                                       <Duration>1</Duration>
                                       <RangeBegin>1</RangeBegin>
-                                      <RangeEnd>8</RangeEnd>
+                                      <RangeEnd>3</RangeEnd>
                                     </Expression>
                                     <Expression xsi:type="WorkflowOutput" />
                                   </Nodes>
@@ -5176,9 +5292,9 @@ LEDRamped = Shift + R
                                       </PropertyMappings>
                                     </Expression>
                                     <Expression xsi:type="IncludeWorkflow" Path="BonVision:Primitives.RangeAnimation.bonsai">
-                                      <Duration>0.5</Duration>
+                                      <Duration>1</Duration>
                                       <RangeBegin>1</RangeBegin>
-                                      <RangeEnd>20</RangeEnd>
+                                      <RangeEnd>5</RangeEnd>
                                     </Expression>
                                     <Expression xsi:type="WorkflowOutput" />
                                   </Nodes>
@@ -5268,7 +5384,7 @@ LEDRamped = Shift + R
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="gl:Delay">
-                            <gl:DueTime>PT3S</gl:DueTime>
+                            <gl:DueTime>PT1S</gl:DueTime>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="rx:SelectMany">
@@ -5424,7 +5540,7 @@ LEDRamped = Shift + R
                                     </Expression>
                                     <Expression xsi:type="IncludeWorkflow" Path="BonVision:Primitives.RangeAnimation.bonsai">
                                       <Duration>1</Duration>
-                                      <RangeBegin>8</RangeBegin>
+                                      <RangeBegin>3</RangeBegin>
                                       <RangeEnd>1</RangeEnd>
                                     </Expression>
                                     <Expression xsi:type="WorkflowOutput" />
@@ -5510,8 +5626,8 @@ LEDRamped = Shift + R
                                       </PropertyMappings>
                                     </Expression>
                                     <Expression xsi:type="IncludeWorkflow" Path="BonVision:Primitives.RangeAnimation.bonsai">
-                                      <Duration>0.5</Duration>
-                                      <RangeBegin>1</RangeBegin>
+                                      <Duration>1</Duration>
+                                      <RangeBegin>5</RangeBegin>
                                       <RangeEnd>1</RangeEnd>
                                     </Expression>
                                     <Expression xsi:type="WorkflowOutput" />
@@ -5936,7 +6052,7 @@ LEDRamped = Shift + R
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="gl:Timer">
-                            <gl:DueTime>PT5S</gl:DueTime>
+                            <gl:DueTime>PT1S</gl:DueTime>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
@@ -6048,24 +6164,148 @@ LEDRamped = Shift + R
         </Workflow>
       </Expression>
       <Expression xsi:type="GroupWorkflow">
-        <Name>ExperimentVisualizer</Name>
-        <Description>Check GPIO and Camera Image</Description>
+        <Name>Visualizer</Name>
+        <Description>Useful experiment nodes visualization</Description>
         <Workflow>
           <Nodes>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>SessionTimer</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="gl:UpdateFrame" />
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>StartExperiment</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:SubscribeWhen" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>TimeStep.ElapsedRealTime</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:Accumulate" />
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Name />
+                    <scr:Expression>TimeSpan.FromSeconds(it)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="2" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source2" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="ui:ObjectTextVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>FileName</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="ui:ObjectTextVisualizer" />
+            </Expression>
+            <Expression xsi:type="gui:TableLayoutPanelBuilder">
+              <gui:Name>ExperimentVisualizer</gui:Name>
+              <gui:Enabled>true</gui:Enabled>
+              <gui:Visible>true</gui:Visible>
+              <gui:Font>Microsoft Sans Serif, 25pt</gui:Font>
+              <gui:ColumnCount>12</gui:ColumnCount>
+              <gui:RowCount>1</gui:RowCount>
+              <gui:ColumnStyles />
+              <gui:RowStyles />
+              <gui:CellSpans>
+                <gui:CellSpan ColumnSpan="2" RowSpan="1" />
+                <gui:CellSpan ColumnSpan="10" RowSpan="1" />
+              </gui:CellSpans>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>ExperimentSession</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>0</ui:X>
+                <ui:Y>80</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>1285</ui:Width>
+                <ui:Height>85</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>Cameras</Name>
             </Expression>
             <Expression xsi:type="MemberSelector">
               <Selector>CamA.Image</Selector>
             </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>CamA - Door</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>0</ui:X>
+                <ui:Y>160</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>650</ui:Width>
+                <ui:Height>650</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
             <Expression xsi:type="MemberSelector">
               <Selector>CamB.Image</Selector>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>CamB - Back</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>640</ui:X>
+                <ui:Y>160</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>650</ui:Width>
+                <ui:Height>650</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
             </Expression>
             <Expression xsi:type="MemberSelector">
               <Selector>CamA.GPIO</Selector>
             </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>GPIO - CamA</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>1280</ui:X>
+                <ui:Y>515</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>600</ui:Width>
+                <ui:Height>150</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
             <Expression xsi:type="MemberSelector">
               <Selector>CamB.GPIO</Selector>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>GPIO - CamB</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>1280</ui:X>
+                <ui:Y>660</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>600</ui:Width>
+                <ui:Height>150</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>SubscribedVideo</Name>
@@ -6073,78 +6313,111 @@ LEDRamped = Shift + R
             <Expression xsi:type="MemberSelector">
               <Selector>CamA.GPIO</Selector>
             </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>StimuliSignal - CamA</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>0</ui:X>
+                <ui:Y>805</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>650</ui:Width>
+                <ui:Height>225</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
             <Expression xsi:type="MemberSelector">
               <Selector>CamB.GPIO</Selector>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Text>StimuliSignal - CamB</ui:Text>
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>640</ui:X>
+                <ui:Y>805</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>650</ui:Width>
+                <ui:Height>225</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
             </Expression>
           </Nodes>
           <Edges>
             <Edge From="0" To="1" Label="Source1" />
-            <Edge From="0" To="2" Label="Source1" />
-            <Edge From="0" To="3" Label="Source1" />
-            <Edge From="0" To="4" Label="Source1" />
+            <Edge From="1" To="5" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source2" />
             <Edge From="5" To="6" Label="Source1" />
-            <Edge From="5" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="7" To="10" Label="Source1" />
+            <Edge From="7" To="12" Label="Source1" />
+            <Edge From="7" To="14" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
+            <Edge From="14" To="15" Label="Source1" />
+            <Edge From="16" To="17" Label="Source1" />
+            <Edge From="16" To="19" Label="Source1" />
+            <Edge From="17" To="18" Label="Source1" />
+            <Edge From="19" To="20" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="wie:KeyDown">
+          <wie:Filter>Space</wie:Filter>
+          <wie:SuppressRepetitions>true</wie:SuppressRepetitions>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="rx:PublishSubject">
+        <Name>StartExperiment</Name>
+      </Expression>
       <Expression xsi:type="GroupWorkflow">
-        <Name>SessionTimer</Name>
+        <Name>Stimuli</Name>
+        <Description>Stimuli triggers</Description>
         <Workflow>
           <Nodes>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="gl:UpdateFrame" />
+            <Expression xsi:type="SubscribeSubject">
+              <Name>VisualStimuliSettings</Name>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>BufferDelayOnset</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>BufferVideo</Name>
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Name />
+                    <scr:Expression>TimeSpan.FromSeconds(it)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="DueTime" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Timer">
+                      <rx:DueTime>PT5S</rx:DueTime>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                </Edges>
+              </Workflow>
             </Expression>
             <Expression xsi:type="SubscribeSubject">
               <Name>StartExperiment</Name>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:SubscribeWhen" />
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>TimeStep.ElapsedRealTime</Selector>
-            </Expression>
-            <Expression xsi:type="rx:Accumulate" />
-            <Expression xsi:type="rx:PublishSubject">
-              <Name>SessionTimer</Name>
-            </Expression>
-            <Expression xsi:type="WorkflowOutput" />
-          </Nodes>
-          <Edges>
-            <Edge From="0" To="2" Label="Source1" />
-            <Edge From="1" To="2" Label="Source2" />
-            <Edge From="2" To="3" Label="Source1" />
-            <Edge From="3" To="4" Label="Source1" />
-            <Edge From="4" To="5" Label="Source1" />
-            <Edge From="5" To="6" Label="Source1" />
-          </Edges>
-        </Workflow>
-      </Expression>
-      <Expression xsi:type="GroupWorkflow">
-        <Name>Stimuli</Name>
-        <Workflow>
-          <Nodes>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>VisualStimuliSettings</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>StartExperiment</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>BufferVideo</Name>
-            </Expression>
-            <Expression xsi:type="scr:ExpressionTransform">
-              <scr:Name />
-              <scr:Expression>TimeSpan.FromSeconds(it)</scr:Expression>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="DueTime" Selector="it" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Delay">
-                <rx:DueTime>PT0S</rx:DueTime>
-              </Combinator>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:SubscribeWhen" />
@@ -6942,7 +7215,7 @@ LEDRamped = Shift + R
                         <Expression xsi:type="IncludeWorkflow" Path="Extensions\LoomRangeAnimation.bonsai">
                           <Duration>PT0.5S</Duration>
                           <MaxRadius>25</MaxRadius>
-                          <MonitorDistance>19</MonitorDistance>
+                          <MonitorDistance>18.5</MonitorDistance>
                           <InitialRadius>1</InitialRadius>
                           <InitialVirtualDistance>12.5</InitialVirtualDistance>
                           <LinearApproachingVelocity>25</LinearApproachingVelocity>
@@ -6993,7 +7266,7 @@ LEDRamped = Shift + R
                         </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="gl:Timer">
-                            <gl:DueTime>PT5M5S</gl:DueTime>
+                            <gl:DueTime>PT5M</gl:DueTime>
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
@@ -11332,203 +11605,283 @@ LEDRamped = Shift + R
             <Expression xsi:type="WorkflowOutput" />
           </Nodes>
           <Edges>
-            <Edge From="0" To="6" Label="Source1" />
-            <Edge From="1" To="5" Label="Source1" />
-            <Edge From="2" To="3" Label="Source1" />
-            <Edge From="3" To="4" Label="Source1" />
-            <Edge From="4" To="5" Label="Source2" />
-            <Edge From="5" To="6" Label="Source2" />
-            <Edge From="5" To="12" Label="Source2" />
+            <Edge From="0" To="4" Label="Source1" />
+            <Edge From="1" To="3" Label="Source1" />
+            <Edge From="2" To="3" Label="Source2" />
+            <Edge From="3" To="4" Label="Source2" />
+            <Edge From="3" To="10" Label="Source2" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
             <Edge From="6" To="7" Label="Source1" />
             <Edge From="7" To="8" Label="Source1" />
-            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="8" To="15" Label="Source1" />
             <Edge From="9" To="10" Label="Source1" />
-            <Edge From="10" To="17" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
             <Edge From="11" To="12" Label="Source1" />
             <Edge From="12" To="13" Label="Source1" />
             <Edge From="13" To="14" Label="Source1" />
-            <Edge From="14" To="15" Label="Source1" />
+            <Edge From="14" To="15" Label="Source2" />
             <Edge From="15" To="16" Label="Source1" />
-            <Edge From="16" To="17" Label="Source2" />
-            <Edge From="17" To="18" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>FilesWriter</Name>
+        <Description>Save experiment .avi and .csv files for each camera.
+
+
+</Description>
         <Workflow>
           <Nodes>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>FileName</Name>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>CamA</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>FileName</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="CamA" Description="Door Cam" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="StringProperty">
+                      <Value>CamA</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="Format">
+                    <Format>{0}\{1}{2}-.avi</Format>
+                    <Selector>Item1.Item1,Item1.Item2,Item2</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:BehaviorSubject">
+                    <Name>NameAVIa</Name>
+                  </Expression>
+                  <Expression xsi:type="Format">
+                    <Format>{0}\{1}{2}-.csv</Format>
+                    <Selector>Item1.Item1,Item1.Item2,Item2</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:BehaviorSubject">
+                    <Name>NameCSVa</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>SubscribedVideo</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>CamA.Image</Selector>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>NameAVIa</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="FileName" Selector="it" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>SamplingRate</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="FrameRate" Selector="it" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:VideoWriter">
+                      <cv:FileName>C:\Users\User\Desktop\Matheus\Personal-Bonfly_ToTest\RawData TEST\EI-GENO-PROTOCOL-SEX-XtoYdays-FHn-CamA-.avi</cv:FileName>
+                      <cv:Suffix>Timestamp</cv:Suffix>
+                      <cv:Buffered>true</cv:Buffered>
+                      <cv:Overwrite>false</cv:Overwrite>
+                      <cv:FourCC>FMP4</cv:FourCC>
+                      <cv:FrameRate>60</cv:FrameRate>
+                      <cv:FrameSize>
+                        <cv:Width>0</cv:Width>
+                        <cv:Height>0</cv:Height>
+                      </cv:FrameSize>
+                      <cv:ResizeInterpolation>NearestNeighbor</cv:ResizeInterpolation>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>CamA.GPIO,CamA.FrameID,CamA.Timestamp</Selector>
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Name>Rename</scr:Name>
+                    <scr:Expression>new(
+Item1 as GPIO,
+Item2 as FrameID,
+Item3 as Timestamp
+)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>NameCSVa</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="FileName" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="io:CsvWriter">
+                    <io:FileName>C:\Users\User\Desktop\Matheus\Personal-Bonfly_ToTest\RawData TEST\EI-GENO-PROTOCOL-SEX-XtoYdays-FHn-CamA-.csv</io:FileName>
+                    <io:Append>false</io:Append>
+                    <io:Overwrite>false</io:Overwrite>
+                    <io:Suffix>Timestamp</io:Suffix>
+                    <io:IncludeHeader>true</io:IncludeHeader>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="3" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source2" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="3" To="6" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="6" To="7" Label="Source1" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="8" To="15" Label="Source1" />
+                  <Edge From="9" To="14" Label="Source1" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="11" To="14" Label="Source2" />
+                  <Edge From="12" To="13" Label="Source1" />
+                  <Edge From="13" To="14" Label="Source3" />
+                  <Edge From="14" To="20" Label="Source1" />
+                  <Edge From="15" To="16" Label="Source1" />
+                  <Edge From="16" To="19" Label="Source2" />
+                  <Edge From="17" To="18" Label="Source1" />
+                  <Edge From="18" To="19" Label="Source3" />
+                  <Edge From="19" To="20" Label="Source2" />
+                  <Edge From="20" To="21" Label="Source1" />
+                </Edges>
+              </Workflow>
             </Expression>
-            <Expression xsi:type="ExternalizedMapping">
-              <Property Name="Value" DisplayName="CamA" Description="Door Cam" />
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="StringProperty">
-                <Value>CamA</Value>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Zip" />
-            </Expression>
-            <Expression xsi:type="Format">
-              <Format>{0}\{1}{2}-.avi</Format>
-              <Selector>Item1.Item1,Item1.Item2,Item2</Selector>
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>NameAVIa</Name>
-            </Expression>
-            <Expression xsi:type="Format">
-              <Format>{0}\{1}{2}-.csv</Format>
-              <Selector>Item1.Item1,Item1.Item2,Item2</Selector>
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>NameCSVa</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>FileName</Name>
-            </Expression>
-            <Expression xsi:type="ExternalizedMapping">
-              <Property Name="Value" DisplayName="CamB" Description="Back Cam" />
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="StringProperty">
-                <Value>CamB</Value>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Zip" />
-            </Expression>
-            <Expression xsi:type="Format">
-              <Format>{0}\{1}{2}-.avi</Format>
-              <Selector>Item1.Item1,Item1.Item2,Item2</Selector>
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>NameAVIb</Name>
-            </Expression>
-            <Expression xsi:type="Format">
-              <Format>{0}\{1}{2}-.csv</Format>
-              <Selector>Item1.Item1,Item1.Item2,Item2</Selector>
-            </Expression>
-            <Expression xsi:type="rx:BehaviorSubject">
-              <Name>NameCSVb</Name>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>SubscribedVideo</Name>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>CamA.Image</Selector>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>NameAVIa</Name>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="FileName" Selector="it" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>SamplingRate</Name>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="FrameRate" Selector="it" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:VideoWriter">
-                <cv:FileName>C:\Users\User\Desktop\Matheus\VPNs_X_CS_ChS\RawData\MF-LC6_X_CS_ChS(Retinal)-1Loom_19Opto(15mWcm2)-Female-4days-FH1-CamA-.avi</cv:FileName>
-                <cv:Suffix>Timestamp</cv:Suffix>
-                <cv:Buffered>true</cv:Buffered>
-                <cv:Overwrite>false</cv:Overwrite>
-                <cv:FourCC>FMP4</cv:FourCC>
-                <cv:FrameRate>60</cv:FrameRate>
-                <cv:FrameSize>
-                  <cv:Width>0</cv:Width>
-                  <cv:Height>0</cv:Height>
-                </cv:FrameSize>
-                <cv:ResizeInterpolation>NearestNeighbor</cv:ResizeInterpolation>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>CamA.GPIO,CamA.FrameID,CamA.Timestamp</Selector>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>NameCSVa</Name>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="FileName" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="io:CsvWriter">
-              <io:FileName>C:\Users\User\Desktop\Matheus\VPNs_X_CS_ChS\RawData\MF-LC6_X_CS_ChS(Retinal)-1Loom_19Opto(15mWcm2)-Female-4days-FH1-CamA-.csv</io:FileName>
-              <io:Append>false</io:Append>
-              <io:Overwrite>false</io:Overwrite>
-              <io:Suffix>Timestamp</io:Suffix>
-              <io:IncludeHeader>true</io:IncludeHeader>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Zip" />
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>SubscribedVideo</Name>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>CamB.Image</Selector>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>NameAVIb</Name>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="FileName" Selector="it" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>SamplingRate</Name>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="FrameRate" Selector="it" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="cv:VideoWriter">
-                <cv:FileName>C:\Users\User\Desktop\Matheus\VPNs_X_CS_ChS\RawData\MF-LC6_X_CS_ChS(Retinal)-1Loom_19Opto(15mWcm2)-Female-4days-FH1-CamB-.avi</cv:FileName>
-                <cv:Suffix>Timestamp</cv:Suffix>
-                <cv:Buffered>true</cv:Buffered>
-                <cv:Overwrite>false</cv:Overwrite>
-                <cv:FourCC>FMP4</cv:FourCC>
-                <cv:FrameRate>60</cv:FrameRate>
-                <cv:FrameSize>
-                  <cv:Width>0</cv:Width>
-                  <cv:Height>0</cv:Height>
-                </cv:FrameSize>
-                <cv:ResizeInterpolation>NearestNeighbor</cv:ResizeInterpolation>
-              </Combinator>
-            </Expression>
-            <Expression xsi:type="MemberSelector">
-              <Selector>CamB.GPIO,CamB.FrameID,CamB.Timestamp</Selector>
-            </Expression>
-            <Expression xsi:type="SubscribeSubject">
-              <Name>NameCSVb</Name>
-            </Expression>
-            <Expression xsi:type="PropertyMapping">
-              <PropertyMappings>
-                <Property Name="FileName" />
-              </PropertyMappings>
-            </Expression>
-            <Expression xsi:type="io:CsvWriter">
-              <io:FileName>C:\Users\User\Desktop\Matheus\VPNs_X_CS_ChS\RawData\MF-LC6_X_CS_ChS(Retinal)-1Loom_19Opto(15mWcm2)-Female-4days-FH1-CamB-.csv</io:FileName>
-              <io:Append>false</io:Append>
-              <io:Overwrite>false</io:Overwrite>
-              <io:Suffix>Timestamp</io:Suffix>
-              <io:IncludeHeader>true</io:IncludeHeader>
-            </Expression>
-            <Expression xsi:type="Combinator">
-              <Combinator xsi:type="rx:Zip" />
+            <Expression xsi:type="GroupWorkflow">
+              <Name>CamB</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>FileName</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="CamB" Description="Back Cam" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="StringProperty">
+                      <Value>CamB</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="Format">
+                    <Format>{0}\{1}{2}-.avi</Format>
+                    <Selector>Item1.Item1,Item1.Item2,Item2</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:BehaviorSubject">
+                    <Name>NameAVIb</Name>
+                  </Expression>
+                  <Expression xsi:type="Format">
+                    <Format>{0}\{1}{2}-.csv</Format>
+                    <Selector>Item1.Item1,Item1.Item2,Item2</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:BehaviorSubject">
+                    <Name>NameCSVb</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>SubscribedVideo</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>CamB.Image</Selector>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>NameAVIb</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="FileName" Selector="it" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>SamplingRate</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="FrameRate" Selector="it" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:VideoWriter">
+                      <cv:FileName>C:\Users\User\Desktop\Matheus\Personal-Bonfly_ToTest\RawData TEST\EI-GENO-PROTOCOL-SEX-XtoYdays-FHn-CamB-.avi</cv:FileName>
+                      <cv:Suffix>Timestamp</cv:Suffix>
+                      <cv:Buffered>true</cv:Buffered>
+                      <cv:Overwrite>false</cv:Overwrite>
+                      <cv:FourCC>FMP4</cv:FourCC>
+                      <cv:FrameRate>60</cv:FrameRate>
+                      <cv:FrameSize>
+                        <cv:Width>0</cv:Width>
+                        <cv:Height>0</cv:Height>
+                      </cv:FrameSize>
+                      <cv:ResizeInterpolation>NearestNeighbor</cv:ResizeInterpolation>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>CamB.GPIO,CamB.FrameID,CamB.Timestamp</Selector>
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Name>Rename</scr:Name>
+                    <scr:Expression>new(
+Item1 as GPIO,
+Item2 as FrameID,
+Item3 as Timestamp
+)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>NameCSVb</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="FileName" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="io:CsvWriter">
+                    <io:FileName>C:\Users\User\Desktop\Matheus\Personal-Bonfly_ToTest\RawData TEST\EI-GENO-PROTOCOL-SEX-XtoYdays-FHn-CamB-.csv</io:FileName>
+                    <io:Append>false</io:Append>
+                    <io:Overwrite>false</io:Overwrite>
+                    <io:Suffix>Timestamp</io:Suffix>
+                    <io:IncludeHeader>true</io:IncludeHeader>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="3" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source2" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="3" To="6" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="6" To="7" Label="Source1" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="8" To="15" Label="Source1" />
+                  <Edge From="9" To="14" Label="Source1" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="11" To="14" Label="Source2" />
+                  <Edge From="12" To="13" Label="Source1" />
+                  <Edge From="13" To="14" Label="Source3" />
+                  <Edge From="14" To="20" Label="Source1" />
+                  <Edge From="15" To="16" Label="Source1" />
+                  <Edge From="16" To="19" Label="Source2" />
+                  <Edge From="17" To="18" Label="Source1" />
+                  <Edge From="18" To="19" Label="Source3" />
+                  <Edge From="19" To="20" Label="Source2" />
+                  <Edge From="20" To="21" Label="Source1" />
+                </Edges>
+              </Workflow>
             </Expression>
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="rx:Zip" />
@@ -11547,64 +11900,18 @@ LEDRamped = Shift + R
             </Expression>
           </Nodes>
           <Edges>
-            <Edge From="0" To="3" Label="Source1" />
-            <Edge From="1" To="2" Label="Source1" />
-            <Edge From="2" To="3" Label="Source2" />
-            <Edge From="3" To="4" Label="Source1" />
-            <Edge From="3" To="6" Label="Source1" />
-            <Edge From="4" To="5" Label="Source1" />
-            <Edge From="6" To="7" Label="Source1" />
-            <Edge From="8" To="11" Label="Source1" />
-            <Edge From="9" To="10" Label="Source1" />
-            <Edge From="10" To="11" Label="Source2" />
-            <Edge From="11" To="12" Label="Source1" />
-            <Edge From="11" To="14" Label="Source1" />
-            <Edge From="12" To="13" Label="Source1" />
-            <Edge From="14" To="15" Label="Source1" />
-            <Edge From="16" To="17" Label="Source1" />
-            <Edge From="16" To="23" Label="Source1" />
-            <Edge From="17" To="22" Label="Source1" />
-            <Edge From="18" To="19" Label="Source1" />
-            <Edge From="19" To="22" Label="Source2" />
-            <Edge From="20" To="21" Label="Source1" />
-            <Edge From="21" To="22" Label="Source3" />
-            <Edge From="22" To="27" Label="Source1" />
-            <Edge From="23" To="26" Label="Source2" />
-            <Edge From="24" To="25" Label="Source1" />
-            <Edge From="25" To="26" Label="Source3" />
-            <Edge From="26" To="27" Label="Source2" />
-            <Edge From="27" To="40" Label="Source1" />
-            <Edge From="28" To="29" Label="Source1" />
-            <Edge From="28" To="35" Label="Source1" />
-            <Edge From="29" To="34" Label="Source1" />
-            <Edge From="30" To="31" Label="Source1" />
-            <Edge From="31" To="34" Label="Source2" />
-            <Edge From="32" To="33" Label="Source1" />
-            <Edge From="33" To="34" Label="Source3" />
-            <Edge From="34" To="39" Label="Source1" />
-            <Edge From="35" To="38" Label="Source2" />
-            <Edge From="36" To="37" Label="Source1" />
-            <Edge From="37" To="38" Label="Source3" />
-            <Edge From="38" To="39" Label="Source2" />
-            <Edge From="39" To="40" Label="Source2" />
-            <Edge From="40" To="42" Label="Source1" />
-            <Edge From="41" To="42" Label="Source2" />
-            <Edge From="42" To="44" Label="Source1" />
-            <Edge From="43" To="44" Label="Source2" />
+            <Edge From="0" To="2" Label="Source1" />
+            <Edge From="1" To="2" Label="Source2" />
+            <Edge From="2" To="4" Label="Source1" />
+            <Edge From="3" To="4" Label="Source2" />
+            <Edge From="4" To="6" Label="Source1" />
+            <Edge From="5" To="6" Label="Source2" />
           </Edges>
         </Workflow>
       </Expression>
-      <Expression xsi:type="Combinator">
-        <Combinator xsi:type="wie:KeyDown">
-          <wie:Filter>Space</wie:Filter>
-          <wie:SuppressRepetitions>true</wie:SuppressRepetitions>
-        </Combinator>
-      </Expression>
-      <Expression xsi:type="rx:PublishSubject">
-        <Name>StartExperiment</Name>
-      </Expression>
       <Expression xsi:type="GroupWorkflow">
         <Name>ExperimentRoutine</Name>
+        <Description>Experiment start and end routine</Description>
         <Workflow>
           <Nodes>
             <Expression xsi:type="SubscribeSubject">
@@ -11652,6 +11959,7 @@ LEDRamped = Shift + R
             </Expression>
             <Expression xsi:type="rx:SelectMany">
               <Name>IR LEDs</Name>
+              <Description>Turn OFF IR LEDs at the end of the experiment</Description>
               <Workflow>
                 <Nodes>
                   <Expression xsi:type="harp:CreateMessage">
@@ -11706,8 +12014,8 @@ LEDRamped = Shift + R
     </Nodes>
     <Edges>
       <Edge From="1" To="2" Label="Source1" />
-      <Edge From="8" To="9" Label="Source1" />
-      <Edge From="10" To="11" Label="Source1" />
+      <Edge From="5" To="6" Label="Source1" />
+      <Edge From="9" To="10" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
