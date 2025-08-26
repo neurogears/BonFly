@@ -21,47 +21,6 @@
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
     <Nodes>
-      <Expression xsi:type="Annotation">
-        <Name>README</Name>
-        <Text><![CDATA[# FlyHigher
-## Protocol
-
-Click on parameters for detailed descriptions.
-
-🪰 Standard values  
-♫ Notes  
-⚠ Warnings  
-
----
-
-### Before experiment
-1. Set experiment parameters (click on **Settings** for extended parameters)  
-2. Start Bonsai (**Start / F5**)  
-3. Check camera binding (**Door**, **Back**)  
-4. Test the stimulus type to be used  
-   ♫ Ensure it renders properly **and** is read on GPIO  
-
----
-
-### ⚠ Warnings
-- Do **not** click on anything while the experiment is running → causes a screen flicker that mimics a lights-off stimulus  
-- Always start by **testing your stimuli** → this sets LED parameters and ensures the photodiode is aligned  
-- LED intensity varies across setups → **never** reuse the same Opto schema across setups  
-- Do not include empty arenas when running <4 flies → delete videos with 0 arenas after the run  
-
----
-
-
-__( · )<&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Start experiment:**  
-\\ _ )&nbsp;&nbsp;)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**→ press *Space* to begin.**
-
----
-
-
-
-
-]]></Text>
-      </Expression>
       <Expression xsi:type="ExternalizedMapping">
         <Property Name="⚠ LED - COM Port" />
         <Property Name="⚠ CamA (Door) - SerialNumber" />
@@ -6217,7 +6176,7 @@ LEDRamped = Shift + R
               <gui:Name>ExperimentVisualizer</gui:Name>
               <gui:Enabled>true</gui:Enabled>
               <gui:Visible>true</gui:Visible>
-              <gui:Font>Microsoft Sans Serif, 25pt</gui:Font>
+              <gui:Font>Microsoft Sans Serif, 15pt</gui:Font>
               <gui:ColumnCount>12</gui:ColumnCount>
               <gui:RowCount>1</gui:RowCount>
               <gui:ColumnStyles />
@@ -12011,11 +11970,52 @@ Item3 as Timestamp
         </Workflow>
       </Expression>
       <Expression xsi:type="WorkflowOutput" />
+      <Expression xsi:type="Annotation">
+        <Name>README</Name>
+        <Text><![CDATA[# FlyHigher
+## Protocol
+
+Click on parameters for detailed descriptions.
+
+🪰 Standard values  
+♫ Notes  
+⚠ Warnings  
+
+---
+
+### Before experiment
+1. Set experiment parameters (click on **Settings** for extended parameters)  
+2. Start Bonsai (**Start / F5**)  
+3. Check camera binding (**Door**, **Back**)  
+4. Test the stimulus type to be used  
+   ♫ Ensure it renders properly **and** is read on GPIO  
+
+---
+
+### ⚠ Warnings
+- Do **not** click on anything while the experiment is running → causes a screen flicker that mimics a lights-off stimulus  
+- Always start by **testing your stimuli** → this sets LED parameters and ensures the photodiode is aligned  
+- LED intensity varies across setups → **never** reuse the same Opto schema across setups  
+- Do not include empty arenas when running <4 flies → delete videos with 0 arenas after the run  
+
+---
+
+
+__( · )<&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**Start experiment:**  
+\\ _ )&nbsp;&nbsp;)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**→ press *Space* to begin.**
+
+---
+
+
+
+
+]]></Text>
+      </Expression>
     </Nodes>
     <Edges>
-      <Edge From="1" To="2" Label="Source1" />
-      <Edge From="5" To="6" Label="Source1" />
-      <Edge From="9" To="10" Label="Source1" />
+      <Edge From="0" To="1" Label="Source1" />
+      <Edge From="4" To="5" Label="Source1" />
+      <Edge From="8" To="9" Label="Source1" />
     </Edges>
   </Workflow>
 </WorkflowBuilder>
