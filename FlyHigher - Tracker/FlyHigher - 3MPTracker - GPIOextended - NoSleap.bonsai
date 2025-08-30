@@ -1,0 +1,3561 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WorkflowBuilder Version="2.9.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
+                 xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                 xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
+                 xmlns:ipy="clr-namespace:Bonsai.Scripting.IronPython;assembly=Bonsai.Scripting.IronPython"
+                 xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
+                 xmlns:cv="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision"
+                 xmlns:p1="clr-namespace:OpenCV.Net;assembly=OpenCV.Net"
+                 xmlns:bz="clr-namespace:BonZeb;assembly=BonZeb"
+                 xmlns:dsp="clr-namespace:Bonsai.Dsp;assembly=Bonsai.Dsp"
+                 xmlns:drw="clr-namespace:Bonsai.Vision.Drawing;assembly=Bonsai.Vision"
+                 xmlns:ui="clr-namespace:Bonsai.Design;assembly=Bonsai.Design"
+                 xmlns:p2="clr-namespace:Bonsai.Vision.Design;assembly=Bonsai.Vision.Design"
+                 xmlns:viz="clr-namespace:Bonsai.Design.Visualizers;assembly=Bonsai.Design.Visualizers"
+                 xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
+                 xmlns="https://bonsai-rx.org/2018/workflow">
+  <Workflow>
+    <Nodes>
+      <Expression xsi:type="ExternalizedMapping">
+        <Property Name="1. Path" DisplayName="ExperimentalFolder" Category="0. Load Path" />
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>GetPath</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="Value" DisplayName="1. Path" />
+            </Expression>
+            <Expression xsi:type="PropertySource" TypeArguments="io:GetDirectories,sys:String">
+              <MemberName>Path</MemberName>
+              <Value>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP</Value>
+            </Expression>
+            <Expression xsi:type="Add">
+              <Operand xsi:type="StringProperty">
+                <Value>\RawData</Value>
+              </Operand>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="Path" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="io:GetFiles">
+                <io:Path>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\RawData</io:Path>
+                <io:SearchPattern>*.avi</io:SearchPattern>
+                <io:SearchOption>TopDirectoryOnly</io:SearchOption>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Concat" />
+            </Expression>
+            <Expression xsi:type="rx:SelectMany">
+              <Name>BonflyPaths</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="ipy:PythonTransform">
+                    <ipy:Name>GetDirectory</ipy:Name>
+                    <ipy:Script>from System.IO import Path
+
+@returns(str)
+def process(value):
+  output = Path.GetDirectoryName(value)
+  return output</ipy:Script>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>RawDataPath</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>VideoPath</Name>
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Name>Avi2Csv</scr:Name>
+                    <scr:Expression>it.Replace(".avi", ".csv")</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>CsvPath</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>RawDataPath</Name>
+                  </Expression>
+                  <Expression xsi:type="ipy:PythonTransform">
+                    <ipy:Name>GetDirectory</ipy:Name>
+                    <ipy:Script>from System.IO import Path
+
+@returns(str)
+def process(value):
+  output = Path.GetDirectoryName(value)
+  return output</ipy:Script>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Add">
+                    <Operand xsi:type="StringProperty">
+                      <Value>\PostProcessing</Value>
+                    </Operand>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>PostProcessingPath</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>RawDataPath</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>PostProcessingPath</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>VideoPath</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>CsvPath</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>VideoPath</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="io:GetFileNameWithoutExtension" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Name>Rename</scr:Name>
+                    <scr:Expression>new(
+Item1 as RawDataPath,
+Item2 as PostProcessingPath,
+Item3 as VideoPath,
+Item4 as StimCsvPath,
+Item5 as FileName)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="0" To="4" Label="Source1" />
+                  <Edge From="0" To="5" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="7" To="8" Label="Source1" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="9" To="10" Label="Source1" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="12" To="18" Label="Source1" />
+                  <Edge From="13" To="18" Label="Source2" />
+                  <Edge From="14" To="18" Label="Source3" />
+                  <Edge From="15" To="18" Label="Source4" />
+                  <Edge From="16" To="17" Label="Source1" />
+                  <Edge From="17" To="18" Label="Source5" />
+                  <Edge From="18" To="19" Label="Source1" />
+                  <Edge From="19" To="20" Label="Source1" />
+                  <Edge From="20" To="21" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="InputMapping">
+        <PropertyMappings />
+      </Expression>
+      <Expression xsi:type="ExternalizedMapping">
+        <Property Name=".FrameRate" />
+        <Property Name="SaveArenaVideo" />
+        <Property Name="ArenaThreshold" />
+        <Property Name="CenteredCropSize" />
+        <Property Name="BackgroundFrames" />
+        <Property Name="SaveCropRaw" />
+        <Property Name="SaveCropSubtracted" />
+      </Expression>
+      <Expression xsi:type="rx:CreateObservable">
+        <Name>OfflineAnalysis</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="WorkflowInput">
+              <Name>Source1</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Take">
+                <rx:Count>1</rx:Count>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:AsyncSubject">
+              <Name>SessionPaths</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>SessionPaths</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>VideoPath</Selector>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="InputVideoPath" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>SessionPaths</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>StimCsvPath</Selector>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="InputStimCsvPath" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="ExternalizedMapping">
+              <Property Name="FrameRate" DisplayName=".FrameRate" Category="2. Output Settings" />
+              <Property Name="SaveArenaVideo" Category="2. Output Settings" />
+              <Property Name="ArenaThreshold" Category="1. Tracking Settings" />
+              <Property Name="CenteredCropSize" Category="1. Tracking Settings" />
+              <Property Name="BackgroundFrames" Category="1. Tracking Settings" />
+              <Property Name="SaveCropRaw" Category="2. Output Settings" />
+              <Property Name="SaveCropSubtracted" Category="2. Output Settings" />
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>Settings</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="CenteredCropSize" />
+                  </Expression>
+                  <Expression xsi:type="PropertySource" TypeArguments="cv:Resize,p1:Size">
+                    <MemberName>Size</MemberName>
+                    <Value>
+                      <Width>128</Width>
+                      <Height>128</Height>
+                    </Value>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>FlyCenteredCropSize</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="ArenaThreshold" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="IntProperty">
+                      <Value>80</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>ArenaThreshold</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="BackgroundFrames" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="IntProperty">
+                      <Value>1000</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>BakgroundFrames</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="InputVideoPath" />
+                  </Expression>
+                  <Expression xsi:type="PropertySource" TypeArguments="cv:FileCapture,sys:String">
+                    <MemberName>FileName</MemberName>
+                    <Value>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\RawData\MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamB-2025-08-26T12_12_47.avi</Value>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>InputVideoPath</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="InputStimCsvPath" />
+                  </Expression>
+                  <Expression xsi:type="PropertySource" TypeArguments="cv:FileCapture,sys:String">
+                    <MemberName>FileName</MemberName>
+                    <Value>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\RawData\MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamB-2025-08-26T12_12_47.csv</Value>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>InputStimCsvPath</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="SaveArenaVideo" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="BooleanProperty">
+                      <Value>true</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>SaveArenaVideo</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="SaveCropRaw" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="BooleanProperty">
+                      <Value>true</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>SaveCropRaw</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="SaveCropSubtracted" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="BooleanProperty">
+                      <Value>true</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>SaveCropSubtracted</Name>
+                  </Expression>
+                  <Expression xsi:type="ExternalizedMapping">
+                    <Property Name="Value" DisplayName="FrameRate" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="IntProperty">
+                      <Value>60</Value>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>FrameRate</Name>
+                  </Expression>
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="6" To="7" Label="Source1" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="9" To="10" Label="Source1" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="12" To="13" Label="Source1" />
+                  <Edge From="13" To="14" Label="Source1" />
+                  <Edge From="14" To="15" Label="Source1" />
+                  <Edge From="16" To="17" Label="Source1" />
+                  <Edge From="17" To="18" Label="Source1" />
+                  <Edge From="18" To="19" Label="Source1" />
+                  <Edge From="20" To="21" Label="Source1" />
+                  <Edge From="21" To="22" Label="Source1" />
+                  <Edge From="22" To="23" Label="Source1" />
+                  <Edge From="24" To="25" Label="Source1" />
+                  <Edge From="25" To="26" Label="Source1" />
+                  <Edge From="26" To="27" Label="Source1" />
+                  <Edge From="28" To="29" Label="Source1" />
+                  <Edge From="29" To="30" Label="Source1" />
+                  <Edge From="30" To="31" Label="Source1" />
+                  <Edge From="32" To="33" Label="Source1" />
+                  <Edge From="33" To="34" Label="Source1" />
+                  <Edge From="34" To="35" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>DataLoader</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>InputStimCsvPath</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="FileName" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>InputVideoPath</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="FileName" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:FileCapture">
+                      <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\RawData\MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamB-2025-08-26T12_12_47.avi</cv:FileName>
+                      <cv:PlaybackRate>999999</cv:PlaybackRate>
+                      <cv:StartPosition>0</cv:StartPosition>
+                      <cv:PositionUnits>Frames</cv:PositionUnits>
+                      <cv:Loop>false</cv:Loop>
+                      <cv:Playing>true</cv:Playing>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="io:CsvReader">
+                    <io:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\RawData\MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamB-2025-08-26T12_12_47.csv</io:FileName>
+                    <io:ScanPattern>%i,%I,%l</io:ScanPattern>
+                    <io:SkipRows>1</io:SkipRows>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item1</Selector>
+                  </Expression>
+                  <Expression xsi:type="ipy:PythonTransform">
+                    <ipy:Script>from System import Tuple
+@returns(Tuple[int, int, int])
+def process(value):
+  if value == 4:
+    return Tuple.Create(0,0,0)
+  if value == 0:
+    return Tuple.Create(1,0,0)
+  if value == 12:
+    return Tuple.Create(0,1,0)
+  if value == 5:
+    return Tuple.Create(0,0,1)
+  if value == 8:
+    return Tuple.Create(1,1,0)
+  if value == 1:
+    return Tuple.Create(1,0,1)
+  if value == 13:
+    return Tuple.Create(0,1,1)
+  if value == 9:
+    return Tuple.Create(1,1,1)</ipy:Script>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Item2,Item3</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Name>Rename</scr:Name>
+                    <scr:Expression>new(
+Item1.Item1 as Visual,
+Item1.Item2 as Stim0,
+Item1.Item3 as Stim1,
+Item2.Item1 as FrameID,
+Item2.Item2 as FrameTimeStamp
+)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="cv:Grayscale" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:ElementIndex" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Index</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Zip" />
+                  </Expression>
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Name>Rename</scr:Name>
+                    <scr:Expression>new(
+Item1 as Stimuli,
+Item2 as Video,
+Item3 as FrameCount_Video
+)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>Video&amp;Stimuli</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:DelaySubscription">
+                      <rx:DueTime>PT7S</rx:DueTime>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>ArenaFeeds</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:SubscribeWhen" />
+                  </Expression>
+                  <Expression xsi:type="rx:Defer">
+                    <Name>Background</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="SubscribeSubject">
+                          <Name>InputVideoPath</Name>
+                        </Expression>
+                        <Expression xsi:type="PropertyMapping">
+                          <PropertyMappings>
+                            <Property Name="FileName" />
+                          </PropertyMappings>
+                        </Expression>
+                        <Expression xsi:type="SubscribeSubject">
+                          <Name>BakgroundFrames</Name>
+                        </Expression>
+                        <Expression xsi:type="PropertyMapping">
+                          <PropertyMappings>
+                            <Property Name="NumberBackgroundFrames" />
+                          </PropertyMappings>
+                        </Expression>
+                        <Expression xsi:type="rx:Defer">
+                          <Name>CalculateBackground</Name>
+                          <Workflow>
+                            <Nodes>
+                              <Expression xsi:type="ExternalizedMapping">
+                                <Property Name="Value" DisplayName="NumberBackgroundFrames" />
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="IntProperty">
+                                  <Value>1000</Value>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Take">
+                                  <rx:Count>1</rx:Count>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="rx:AsyncSubject">
+                                <Name>NumberBackgroundFrames</Name>
+                              </Expression>
+                              <Expression xsi:type="ExternalizedMapping">
+                                <Property Name="Value" DisplayName="FileName" />
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="StringProperty">
+                                  <Value>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\RawData\MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamB-2025-08-26T12_12_47.avi</Value>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Take">
+                                  <rx:Count>1</rx:Count>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="rx:AsyncSubject">
+                                <Name>FileName</Name>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>FileName</Name>
+                              </Expression>
+                              <Expression xsi:type="PropertyMapping">
+                                <PropertyMappings>
+                                  <Property Name="FileName" />
+                                </PropertyMappings>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:FileCapture">
+                                  <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\RawData\MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamB-2025-08-26T12_12_47.avi</cv:FileName>
+                                  <cv:PlaybackRate>99999999</cv:PlaybackRate>
+                                  <cv:StartPosition>0</cv:StartPosition>
+                                  <cv:PositionUnits>Frames</cv:PositionUnits>
+                                  <cv:Loop>false</cv:Loop>
+                                  <cv:Playing>true</cv:Playing>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:Grayscale" />
+                              </Expression>
+                              <Expression xsi:type="ExternalizedMapping">
+                                <Property Name="PixelSearch" />
+                                <Property Name="NoiseThreshold" />
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="bz:CalculateBackground">
+                                  <bz:PixelSearch>Brightest</bz:PixelSearch>
+                                  <bz:NoiseThreshold>0</bz:NoiseThreshold>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>NumberBackgroundFrames</Name>
+                              </Expression>
+                              <Expression xsi:type="PropertyMapping">
+                                <PropertyMappings>
+                                  <Property Name="Count" />
+                                </PropertyMappings>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Take">
+                                  <rx:Count>1000</rx:Count>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:TakeLast">
+                                  <rx:Count>1</rx:Count>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="WorkflowOutput" />
+                            </Nodes>
+                            <Edges>
+                              <Edge From="0" To="1" Label="Source1" />
+                              <Edge From="1" To="2" Label="Source1" />
+                              <Edge From="2" To="3" Label="Source1" />
+                              <Edge From="4" To="5" Label="Source1" />
+                              <Edge From="5" To="6" Label="Source1" />
+                              <Edge From="6" To="7" Label="Source1" />
+                              <Edge From="8" To="9" Label="Source1" />
+                              <Edge From="9" To="10" Label="Source1" />
+                              <Edge From="10" To="11" Label="Source1" />
+                              <Edge From="11" To="13" Label="Source1" />
+                              <Edge From="12" To="13" Label="Source2" />
+                              <Edge From="13" To="16" Label="Source1" />
+                              <Edge From="14" To="15" Label="Source1" />
+                              <Edge From="15" To="16" Label="Source2" />
+                              <Edge From="16" To="17" Label="Source1" />
+                              <Edge From="17" To="18" Label="Source1" />
+                            </Edges>
+                          </Workflow>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:Take">
+                            <rx:Count>1</rx:Count>
+                          </Combinator>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="4" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source1" />
+                        <Edge From="3" To="4" Label="Source2" />
+                        <Edge From="4" To="5" Label="Source1" />
+                        <Edge From="5" To="6" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>BackgroundImage</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:SelectMany">
+                    <Name>FindArenas</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="SubscribeSubject">
+                          <Name>ArenaThreshold</Name>
+                        </Expression>
+                        <Expression xsi:type="PropertyMapping">
+                          <PropertyMappings>
+                            <Property Name="ThresholdValue" />
+                          </PropertyMappings>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="cv:Threshold">
+                            <cv:ThresholdValue>80</cv:ThresholdValue>
+                            <cv:MaxValue>255</cv:MaxValue>
+                            <cv:ThresholdType>Binary</cv:ThresholdType>
+                          </Combinator>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="cv:FindContours">
+                            <cv:Mode>ConnectedComponent</cv:Mode>
+                            <cv:Method>ChainApproxNone</cv:Method>
+                            <cv:Offset>
+                              <cv:X>0</cv:X>
+                              <cv:Y>0</cv:Y>
+                            </cv:Offset>
+                            <cv:MinArea>290000</cv:MinArea>
+                            <cv:MaxArea>380000</cv:MaxArea>
+                          </Combinator>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="cv:BinaryRegionAnalysis" />
+                        </Expression>
+                        <Expression xsi:type="rx:OrderBy">
+                          <rx:KeySelector>Centroid.X,Centroid.Y</rx:KeySelector>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:Take">
+                            <rx:Count>1</rx:Count>
+                          </Combinator>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="3" Label="Source1" />
+                        <Edge From="1" To="2" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                        <Edge From="4" To="5" Label="Source1" />
+                        <Edge From="5" To="6" Label="Source1" />
+                        <Edge From="6" To="7" Label="Source1" />
+                        <Edge From="7" To="8" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>ArenaROIs</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:SelectMany">
+                    <Name>CropBackgrounds</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="SubscribeSubject">
+                          <Name>ArenaROIs</Name>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:Take">
+                            <rx:Count>1</rx:Count>
+                          </Combinator>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:Merge" />
+                        </Expression>
+                        <Expression xsi:type="rx:CreateObservable">
+                          <Name>CropBackgroundArenas</Name>
+                          <Workflow>
+                            <Nodes>
+                              <Expression xsi:type="WorkflowInput">
+                                <Name>Source1</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Take">
+                                  <rx:Count>1</rx:Count>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="rx:AsyncSubject">
+                                <Name>ArenaDetection</Name>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>BackgroundImage</Name>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaDetection</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Contour.Rect</Selector>
+                              </Expression>
+                              <Expression xsi:type="PropertyMapping">
+                                <PropertyMappings>
+                                  <Property Name="RegionOfInterest" />
+                                </PropertyMappings>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:Crop">
+                                  <cv:RegionOfInterest>
+                                    <cv:X>830</cv:X>
+                                    <cv:Y>49</cv:Y>
+                                    <cv:Width>668</cv:Width>
+                                    <cv:Height>671</cv:Height>
+                                  </cv:RegionOfInterest>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="WorkflowOutput" />
+                            </Nodes>
+                            <Edges>
+                              <Edge From="0" To="1" Label="Source1" />
+                              <Edge From="1" To="2" Label="Source1" />
+                              <Edge From="3" To="7" Label="Source1" />
+                              <Edge From="4" To="5" Label="Source1" />
+                              <Edge From="5" To="6" Label="Source1" />
+                              <Edge From="6" To="7" Label="Source2" />
+                              <Edge From="7" To="8" Label="Source1" />
+                            </Edges>
+                          </Workflow>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:Zip" />
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:Take">
+                            <rx:Count>1</rx:Count>
+                          </Combinator>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="2" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source1" />
+                        <Edge From="3" To="4" Label="Source1" />
+                        <Edge From="4" To="5" Label="Source1" />
+                        <Edge From="5" To="6" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>CroppedBackground</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:SelectMany">
+                    <Name>CreateArenaFeeds</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="SubscribeSubject">
+                          <Name>ArenaROIs</Name>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:Take">
+                            <rx:Count>1</rx:Count>
+                          </Combinator>
+                        </Expression>
+                        <Expression xsi:type="SubscribeSubject">
+                          <Name>InputVideoPath</Name>
+                        </Expression>
+                        <Expression xsi:type="PropertyMapping">
+                          <PropertyMappings>
+                            <Property Name="FileName" />
+                          </PropertyMappings>
+                        </Expression>
+                        <Expression xsi:type="rx:SelectMany">
+                          <Name>TrackArenas</Name>
+                          <Workflow>
+                            <Nodes>
+                              <Expression xsi:type="ExternalizedMapping">
+                                <Property Name="Value" DisplayName="FileName" />
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="StringProperty">
+                                  <Value>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\RawData\MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamB-2025-08-26T12_12_47.avi</Value>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Take">
+                                  <rx:Count>1</rx:Count>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="rx:AsyncSubject">
+                                <Name>FileName</Name>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>CroppedBackground</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Merge" />
+                              </Expression>
+                              <Expression xsi:type="WorkflowInput">
+                                <Name>Source1</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Merge" />
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Zip" />
+                              </Expression>
+                              <Expression xsi:type="rx:CreateObservable">
+                                <Name>CropCenter</Name>
+                                <Workflow>
+                                  <Nodes>
+                                    <Expression xsi:type="WorkflowInput">
+                                      <Name>Source1</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:Take">
+                                        <rx:Count>1</rx:Count>
+                                      </Combinator>
+                                    </Expression>
+                                    <Expression xsi:type="rx:AsyncSubject">
+                                      <Name>This</Name>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>This</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>Item1</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:Take">
+                                        <rx:Count>1</rx:Count>
+                                      </Combinator>
+                                    </Expression>
+                                    <Expression xsi:type="rx:AsyncSubject">
+                                      <Name>CropBackground</Name>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>Video&amp;Stimuli</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>Video</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>This</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>Item2.Contour.Rect</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:WithLatestFrom" />
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>Item1</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>Item2</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="PropertyMapping">
+                                      <PropertyMappings>
+                                        <Property Name="RegionOfInterest" Selector="it" />
+                                      </PropertyMappings>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="cv:Crop">
+                                        <cv:RegionOfInterest>
+                                          <cv:X>830</cv:X>
+                                          <cv:Y>49</cv:Y>
+                                          <cv:Width>668</cv:Width>
+                                          <cv:Height>671</cv:Height>
+                                        </cv:RegionOfInterest>
+                                      </Combinator>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>CropBackground</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:WithLatestFrom" />
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="dsp:AbsoluteDifference" />
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>CropBackground</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:WithLatestFrom" />
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>Item2</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>Stimuli</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="GroupWorkflow">
+                                      <Name>ArenaMaskFrame</Name>
+                                      <Workflow>
+                                        <Nodes>
+                                          <Expression xsi:type="SubscribeSubject">
+                                            <Name>BackgroundImage</Name>
+                                          </Expression>
+                                          <Expression xsi:type="SubscribeSubject">
+                                            <Name>This</Name>
+                                          </Expression>
+                                          <Expression xsi:type="Combinator">
+                                            <Combinator xsi:type="rx:WithLatestFrom" />
+                                          </Expression>
+                                          <Expression xsi:type="InputMapping">
+                                            <PropertyMappings>
+                                              <Property Name="RegionOfInterest" Selector="Item2.Item2.Contour.Rect" />
+                                            </PropertyMappings>
+                                            <Selector>Item1</Selector>
+                                          </Expression>
+                                          <Expression xsi:type="Combinator">
+                                            <Combinator xsi:type="cv:Crop">
+                                              <cv:RegionOfInterest>
+                                                <cv:X>830</cv:X>
+                                                <cv:Y>49</cv:Y>
+                                                <cv:Width>668</cv:Width>
+                                                <cv:Height>671</cv:Height>
+                                              </cv:RegionOfInterest>
+                                            </Combinator>
+                                          </Expression>
+                                          <Expression xsi:type="SubscribeSubject">
+                                            <Name>This</Name>
+                                          </Expression>
+                                          <Expression xsi:type="MemberSelector">
+                                            <Selector>Item2</Selector>
+                                          </Expression>
+                                          <Expression xsi:type="MemberSelector">
+                                            <Selector>Contour</Selector>
+                                          </Expression>
+                                          <Expression xsi:type="Combinator">
+                                            <Combinator xsi:type="cv:DrawContours">
+                                              <cv:MaxLevel>1</cv:MaxLevel>
+                                              <cv:Thickness>-1</cv:Thickness>
+                                            </Combinator>
+                                          </Expression>
+                                          <Expression xsi:type="Combinator">
+                                            <Combinator xsi:type="rx:WithLatestFrom" />
+                                          </Expression>
+                                          <Expression xsi:type="BitwiseAnd" />
+                                          <Expression xsi:type="WorkflowOutput" />
+                                        </Nodes>
+                                        <Edges>
+                                          <Edge From="0" To="2" Label="Source1" />
+                                          <Edge From="1" To="2" Label="Source2" />
+                                          <Edge From="2" To="3" Label="Source1" />
+                                          <Edge From="3" To="4" Label="Source1" />
+                                          <Edge From="4" To="9" Label="Source1" />
+                                          <Edge From="5" To="6" Label="Source1" />
+                                          <Edge From="6" To="7" Label="Source1" />
+                                          <Edge From="7" To="8" Label="Source1" />
+                                          <Edge From="8" To="9" Label="Source2" />
+                                          <Edge From="9" To="10" Label="Source1" />
+                                          <Edge From="10" To="11" Label="Source1" />
+                                        </Edges>
+                                      </Workflow>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:WithLatestFrom" />
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>Item2</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="GroupWorkflow">
+                                      <Name>ArenaMaskVideo</Name>
+                                      <Workflow>
+                                        <Nodes>
+                                          <Expression xsi:type="SubscribeSubject">
+                                            <Name>Video&amp;Stimuli</Name>
+                                          </Expression>
+                                          <Expression xsi:type="MemberSelector">
+                                            <Selector>Video</Selector>
+                                          </Expression>
+                                          <Expression xsi:type="SubscribeSubject">
+                                            <Name>This</Name>
+                                          </Expression>
+                                          <Expression xsi:type="Combinator">
+                                            <Combinator xsi:type="rx:WithLatestFrom" />
+                                          </Expression>
+                                          <Expression xsi:type="InputMapping">
+                                            <PropertyMappings>
+                                              <Property Name="RegionOfInterest" Selector="Item2.Item2.Contour.Rect" />
+                                            </PropertyMappings>
+                                            <Selector>Item1</Selector>
+                                          </Expression>
+                                          <Expression xsi:type="Combinator">
+                                            <Combinator xsi:type="cv:Crop">
+                                              <cv:RegionOfInterest>
+                                                <cv:X>830</cv:X>
+                                                <cv:Y>49</cv:Y>
+                                                <cv:Width>668</cv:Width>
+                                                <cv:Height>671</cv:Height>
+                                              </cv:RegionOfInterest>
+                                            </Combinator>
+                                          </Expression>
+                                          <Expression xsi:type="SubscribeSubject">
+                                            <Name>This</Name>
+                                          </Expression>
+                                          <Expression xsi:type="MemberSelector">
+                                            <Selector>Item2</Selector>
+                                          </Expression>
+                                          <Expression xsi:type="MemberSelector">
+                                            <Selector>Contour</Selector>
+                                          </Expression>
+                                          <Expression xsi:type="Combinator">
+                                            <Combinator xsi:type="cv:DrawContours">
+                                              <cv:MaxLevel>1</cv:MaxLevel>
+                                              <cv:Thickness>-1</cv:Thickness>
+                                            </Combinator>
+                                          </Expression>
+                                          <Expression xsi:type="Combinator">
+                                            <Combinator xsi:type="rx:WithLatestFrom" />
+                                          </Expression>
+                                          <Expression xsi:type="BitwiseAnd" />
+                                          <Expression xsi:type="WorkflowOutput" />
+                                        </Nodes>
+                                        <Edges>
+                                          <Edge From="0" To="1" Label="Source1" />
+                                          <Edge From="1" To="3" Label="Source1" />
+                                          <Edge From="2" To="3" Label="Source2" />
+                                          <Edge From="3" To="4" Label="Source1" />
+                                          <Edge From="4" To="5" Label="Source1" />
+                                          <Edge From="5" To="10" Label="Source1" />
+                                          <Edge From="6" To="7" Label="Source1" />
+                                          <Edge From="7" To="8" Label="Source1" />
+                                          <Edge From="8" To="9" Label="Source1" />
+                                          <Edge From="9" To="10" Label="Source2" />
+                                          <Edge From="10" To="11" Label="Source1" />
+                                          <Edge From="11" To="12" Label="Source1" />
+                                        </Edges>
+                                      </Workflow>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:WithLatestFrom" />
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>Item2</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:Zip" />
+                                    </Expression>
+                                    <Expression xsi:type="scr:ExpressionTransform">
+                                      <scr:Expression>new(
+Item1 as RawVideo,
+Item2 as BackgroundSubtractedVideo,
+Item3 as RawBackgroundFrame,
+Item4 as Stimuli,
+Item5 as MaskedArenaFrame,
+Item6 as MaskedArenaVideo
+)</scr:Expression>
+                                    </Expression>
+                                    <Expression xsi:type="WorkflowOutput" />
+                                  </Nodes>
+                                  <Edges>
+                                    <Edge From="0" To="1" Label="Source1" />
+                                    <Edge From="1" To="2" Label="Source1" />
+                                    <Edge From="3" To="4" Label="Source1" />
+                                    <Edge From="4" To="5" Label="Source1" />
+                                    <Edge From="5" To="6" Label="Source1" />
+                                    <Edge From="7" To="8" Label="Source1" />
+                                    <Edge From="7" To="22" Label="Source1" />
+                                    <Edge From="8" To="11" Label="Source1" />
+                                    <Edge From="9" To="10" Label="Source1" />
+                                    <Edge From="10" To="11" Label="Source2" />
+                                    <Edge From="11" To="12" Label="Source1" />
+                                    <Edge From="11" To="13" Label="Source1" />
+                                    <Edge From="12" To="15" Label="Source1" />
+                                    <Edge From="13" To="14" Label="Source1" />
+                                    <Edge From="14" To="15" Label="Source2" />
+                                    <Edge From="15" To="17" Label="Source1" />
+                                    <Edge From="15" To="20" Label="Source1" />
+                                    <Edge From="15" To="24" Label="Source1" />
+                                    <Edge From="15" To="27" Label="Source1" />
+                                    <Edge From="15" To="29" Label="Source1" />
+                                    <Edge From="16" To="17" Label="Source2" />
+                                    <Edge From="17" To="18" Label="Source1" />
+                                    <Edge From="18" To="29" Label="Source2" />
+                                    <Edge From="19" To="20" Label="Source2" />
+                                    <Edge From="20" To="21" Label="Source1" />
+                                    <Edge From="21" To="29" Label="Source3" />
+                                    <Edge From="22" To="29" Label="Source4" />
+                                    <Edge From="23" To="24" Label="Source2" />
+                                    <Edge From="24" To="25" Label="Source1" />
+                                    <Edge From="25" To="29" Label="Source5" />
+                                    <Edge From="26" To="27" Label="Source2" />
+                                    <Edge From="27" To="28" Label="Source1" />
+                                    <Edge From="28" To="29" Label="Source6" />
+                                    <Edge From="29" To="30" Label="Source1" />
+                                    <Edge From="30" To="31" Label="Source1" />
+                                  </Edges>
+                                </Workflow>
+                              </Expression>
+                              <Expression xsi:type="WorkflowOutput" />
+                            </Nodes>
+                            <Edges>
+                              <Edge From="0" To="1" Label="Source1" />
+                              <Edge From="1" To="2" Label="Source1" />
+                              <Edge From="2" To="3" Label="Source1" />
+                              <Edge From="4" To="5" Label="Source1" />
+                              <Edge From="5" To="8" Label="Source1" />
+                              <Edge From="6" To="7" Label="Source1" />
+                              <Edge From="7" To="8" Label="Source2" />
+                              <Edge From="8" To="9" Label="Source1" />
+                              <Edge From="9" To="10" Label="Source1" />
+                            </Edges>
+                          </Workflow>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:ToList" />
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="4" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source1" />
+                        <Edge From="3" To="4" Label="Source2" />
+                        <Edge From="4" To="5" Label="Source1" />
+                        <Edge From="5" To="6" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="rx:AsyncSubject">
+                    <Name>ArenaFeeds</Name>
+                  </Expression>
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="5" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source2" />
+                  <Edge From="4" To="11" Label="Source1" />
+                  <Edge From="4" To="12" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="5" To="8" Label="Source1" />
+                  <Edge From="6" To="7" Label="Source1" />
+                  <Edge From="7" To="9" Label="Source1" />
+                  <Edge From="8" To="9" Label="Source2" />
+                  <Edge From="9" To="10" Label="Source1" />
+                  <Edge From="10" To="14" Label="Source1" />
+                  <Edge From="11" To="14" Label="Source2" />
+                  <Edge From="12" To="13" Label="Source1" />
+                  <Edge From="13" To="14" Label="Source3" />
+                  <Edge From="14" To="15" Label="Source1" />
+                  <Edge From="15" To="16" Label="Source1" />
+                  <Edge From="16" To="17" Label="Source1" />
+                  <Edge From="17" To="20" Label="Source1" />
+                  <Edge From="18" To="19" Label="Source1" />
+                  <Edge From="19" To="20" Label="Source2" />
+                  <Edge From="21" To="22" Label="Source1" />
+                  <Edge From="22" To="23" Label="Source1" />
+                  <Edge From="23" To="24" Label="Source1" />
+                  <Edge From="24" To="25" Label="Source1" />
+                  <Edge From="25" To="26" Label="Source1" />
+                  <Edge From="26" To="27" Label="Source1" />
+                  <Edge From="27" To="28" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>AnalysisPipeline</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>ArenaFeeds</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Take">
+                      <rx:Count>1</rx:Count>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Merge" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:ElementIndex" />
+                  </Expression>
+                  <Expression xsi:type="rx:CreateObservable">
+                    <Name>ProcessSingleArenaFrames</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="rx:ReplaySubject">
+                          <Name>Data</Name>
+                          <rx:BufferSize xsi:nil="true" />
+                        </Expression>
+                        <Expression xsi:type="SubscribeSubject">
+                          <Name>Data</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Index</Selector>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:Take">
+                            <rx:Count>1</rx:Count>
+                          </Combinator>
+                        </Expression>
+                        <Expression xsi:type="rx:AsyncSubject">
+                          <Name>ArenaIndex</Name>
+                        </Expression>
+                        <Expression xsi:type="SubscribeSubject">
+                          <Name>Data</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>Value</Selector>
+                        </Expression>
+                        <Expression xsi:type="Combinator">
+                          <Combinator xsi:type="rx:Merge" />
+                        </Expression>
+                        <Expression xsi:type="rx:PublishSubject">
+                          <Name>ArenaVideoStream</Name>
+                        </Expression>
+                        <Expression xsi:type="GroupWorkflow">
+                          <Name>CentroidTracking</Name>
+                          <Workflow>
+                            <Nodes>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaVideoStream</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>BackgroundSubtractedVideo</Selector>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:Threshold">
+                                  <cv:ThresholdValue>76</cv:ThresholdValue>
+                                  <cv:MaxValue>255</cv:MaxValue>
+                                  <cv:ThresholdType>Binary</cv:ThresholdType>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:FindContours">
+                                  <cv:Mode>External</cv:Mode>
+                                  <cv:Method>ChainApproxNone</cv:Method>
+                                  <cv:Offset>
+                                    <cv:X>0</cv:X>
+                                    <cv:Y>0</cv:Y>
+                                  </cv:Offset>
+                                  <cv:MinArea>3</cv:MinArea>
+                                  <cv:MaxArea xsi:nil="true" />
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:BinaryRegionAnalysis" />
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:LargestBinaryRegion" />
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Centroid</Selector>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:Threshold">
+                                  <cv:ThresholdValue>21</cv:ThresholdValue>
+                                  <cv:MaxValue>255</cv:MaxValue>
+                                  <cv:ThresholdType>Binary</cv:ThresholdType>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:FindContours">
+                                  <cv:Mode>External</cv:Mode>
+                                  <cv:Method>ChainApproxNone</cv:Method>
+                                  <cv:Offset>
+                                    <cv:X>0</cv:X>
+                                    <cv:Y>0</cv:Y>
+                                  </cv:Offset>
+                                  <cv:MinArea>3</cv:MinArea>
+                                  <cv:MaxArea xsi:nil="true" />
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:BinaryRegionAnalysis" />
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:LargestBinaryRegion" />
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Centroid</Selector>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Zip" />
+                              </Expression>
+                              <Expression xsi:type="scr:ExpressionTransform">
+                                <scr:Name>Rename</scr:Name>
+                                <scr:Expression>new(
+Item1 as SoftCentroid,
+Item2 as HardCentroid)</scr:Expression>
+                              </Expression>
+                              <Expression xsi:type="scr:ExpressionTransform">
+                                <scr:Name>PickBestCentroid</scr:Name>
+                                <scr:Expression>it.SoftCentroid.X &gt; 0 ? it.SoftCentroid : it.HardCentroid</scr:Expression>
+                              </Expression>
+                              <Expression xsi:type="rx:PublishSubject">
+                                <Name>BestCentroid</Name>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>BestCentroid</Name>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaVideoStream</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>RawVideo.RegionOfInterest</Selector>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:WithLatestFrom" />
+                              </Expression>
+                              <Expression xsi:type="scr:ExpressionTransform">
+                                <scr:Expression>new( 
+Item1.X / Item2.Width as X,
+Item1.Y / Item2.Height as Y
+)</scr:Expression>
+                              </Expression>
+                              <Expression xsi:type="InputMapping">
+                                <PropertyMappings>
+                                  <Property Name="X" Selector="X" />
+                                  <Property Name="Y" Selector="Y" />
+                                </PropertyMappings>
+                                <Selector>X,Y</Selector>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:CreatePoint2f">
+                                  <cv:X>0.9018414</cv:X>
+                                  <cv:Y>0.440407544</cv:Y>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="rx:PublishSubject">
+                                <Name>NormalizedBestCentroid</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Zip" />
+                              </Expression>
+                              <Expression xsi:type="WorkflowOutput" />
+                            </Nodes>
+                            <Edges>
+                              <Edge From="0" To="1" Label="Source1" />
+                              <Edge From="1" To="2" Label="Source1" />
+                              <Edge From="1" To="7" Label="Source1" />
+                              <Edge From="2" To="3" Label="Source1" />
+                              <Edge From="3" To="4" Label="Source1" />
+                              <Edge From="4" To="5" Label="Source1" />
+                              <Edge From="5" To="6" Label="Source1" />
+                              <Edge From="6" To="12" Label="Source1" />
+                              <Edge From="7" To="8" Label="Source1" />
+                              <Edge From="8" To="9" Label="Source1" />
+                              <Edge From="9" To="10" Label="Source1" />
+                              <Edge From="10" To="11" Label="Source1" />
+                              <Edge From="11" To="12" Label="Source2" />
+                              <Edge From="12" To="13" Label="Source1" />
+                              <Edge From="13" To="14" Label="Source1" />
+                              <Edge From="14" To="15" Label="Source1" />
+                              <Edge From="15" To="24" Label="Source1" />
+                              <Edge From="16" To="19" Label="Source1" />
+                              <Edge From="17" To="18" Label="Source1" />
+                              <Edge From="18" To="19" Label="Source2" />
+                              <Edge From="19" To="20" Label="Source1" />
+                              <Edge From="20" To="21" Label="Source1" />
+                              <Edge From="21" To="22" Label="Source1" />
+                              <Edge From="22" To="23" Label="Source1" />
+                              <Edge From="23" To="24" Label="Source2" />
+                              <Edge From="24" To="25" Label="Source1" />
+                            </Edges>
+                          </Workflow>
+                        </Expression>
+                        <Expression xsi:type="GroupWorkflow">
+                          <Name>PixelChange</Name>
+                          <Workflow>
+                            <Nodes>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaVideoStream</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>BackgroundSubtractedVideo</Selector>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:BackgroundSubtraction">
+                                  <cv:BackgroundFrames>1</cv:BackgroundFrames>
+                                  <cv:AdaptationRate>1</cv:AdaptationRate>
+                                  <cv:ThresholdValue>10</cv:ThresholdValue>
+                                  <cv:ThresholdType>Binary</cv:ThresholdType>
+                                  <cv:SubtractionMethod>Dark</cv:SubtractionMethod>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:FindContours">
+                                  <cv:Mode>External</cv:Mode>
+                                  <cv:Method>ChainApproxNone</cv:Method>
+                                  <cv:Offset>
+                                    <cv:X>0</cv:X>
+                                    <cv:Y>0</cv:Y>
+                                  </cv:Offset>
+                                  <cv:MinArea>3</cv:MinArea>
+                                  <cv:MaxArea xsi:nil="true" />
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:DrawContours">
+                                  <cv:MaxLevel>1</cv:MaxLevel>
+                                  <cv:Thickness>-1</cv:Thickness>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="dsp:CountNonZero" />
+                              </Expression>
+                              <Expression xsi:type="rx:PublishSubject">
+                                <Name>PixelChange</Name>
+                              </Expression>
+                              <Expression xsi:type="WorkflowOutput" />
+                            </Nodes>
+                            <Edges>
+                              <Edge From="0" To="1" Label="Source1" />
+                              <Edge From="1" To="2" Label="Source1" />
+                              <Edge From="2" To="3" Label="Source1" />
+                              <Edge From="3" To="4" Label="Source1" />
+                              <Edge From="4" To="5" Label="Source1" />
+                              <Edge From="5" To="6" Label="Source1" />
+                              <Edge From="6" To="7" Label="Source1" />
+                            </Edges>
+                          </Workflow>
+                        </Expression>
+                        <Expression xsi:type="GroupWorkflow">
+                          <Name>CenteredVideo</Name>
+                          <Workflow>
+                            <Nodes>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaVideoStream</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>RawVideo</Selector>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>BestCentroid</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Zip" />
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>FlyCenteredCropSize</Name>
+                              </Expression>
+                              <Expression xsi:type="PropertyMapping">
+                                <PropertyMappings>
+                                  <Property Name="Size" />
+                                </PropertyMappings>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:CropCenter">
+                                  <cv:Size>
+                                    <cv:Width>128</cv:Width>
+                                    <cv:Height>128</cv:Height>
+                                  </cv:Size>
+                                  <cv:FillValue>
+                                    <cv:Val0>0</cv:Val0>
+                                    <cv:Val1>0</cv:Val1>
+                                    <cv:Val2>0</cv:Val2>
+                                    <cv:Val3>0</cv:Val3>
+                                  </cv:FillValue>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="rx:PublishSubject">
+                                <Name>CenteredVideo</Name>
+                              </Expression>
+                              <Expression xsi:type="WorkflowOutput" />
+                            </Nodes>
+                            <Edges>
+                              <Edge From="0" To="1" Label="Source1" />
+                              <Edge From="1" To="3" Label="Source1" />
+                              <Edge From="2" To="3" Label="Source2" />
+                              <Edge From="3" To="6" Label="Source1" />
+                              <Edge From="4" To="5" Label="Source1" />
+                              <Edge From="5" To="6" Label="Source2" />
+                              <Edge From="6" To="7" Label="Source1" />
+                              <Edge From="7" To="8" Label="Source1" />
+                            </Edges>
+                          </Workflow>
+                        </Expression>
+                        <Expression xsi:type="Disable">
+                          <Builder xsi:type="GroupWorkflow">
+                            <Name>CenteredBackgroundSubVideo</Name>
+                            <Workflow>
+                              <Nodes>
+                                <Expression xsi:type="SubscribeSubject">
+                                  <Name>ArenaVideoStream</Name>
+                                </Expression>
+                                <Expression xsi:type="MemberSelector">
+                                  <Selector>BackgroundSubtractedVideo</Selector>
+                                </Expression>
+                                <Expression xsi:type="SubscribeSubject">
+                                  <Name>BestCentroid</Name>
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="rx:Zip" />
+                                </Expression>
+                                <Expression xsi:type="SubscribeSubject">
+                                  <Name>FlyCenteredCropSize</Name>
+                                </Expression>
+                                <Expression xsi:type="PropertyMapping">
+                                  <PropertyMappings>
+                                    <Property Name="Size" />
+                                  </PropertyMappings>
+                                </Expression>
+                                <Expression xsi:type="Combinator">
+                                  <Combinator xsi:type="cv:CropCenter">
+                                    <cv:Size>
+                                      <cv:Width>128</cv:Width>
+                                      <cv:Height>128</cv:Height>
+                                    </cv:Size>
+                                    <cv:FillValue>
+                                      <cv:Val0>0</cv:Val0>
+                                      <cv:Val1>0</cv:Val1>
+                                      <cv:Val2>0</cv:Val2>
+                                      <cv:Val3>0</cv:Val3>
+                                    </cv:FillValue>
+                                  </Combinator>
+                                </Expression>
+                                <Expression xsi:type="rx:PublishSubject">
+                                  <Name>CenteredVideoBackSub</Name>
+                                </Expression>
+                                <Expression xsi:type="WorkflowOutput" />
+                              </Nodes>
+                              <Edges>
+                                <Edge From="0" To="1" Label="Source1" />
+                                <Edge From="1" To="3" Label="Source1" />
+                                <Edge From="2" To="3" Label="Source2" />
+                                <Edge From="3" To="6" Label="Source1" />
+                                <Edge From="4" To="5" Label="Source1" />
+                                <Edge From="5" To="6" Label="Source2" />
+                                <Edge From="6" To="7" Label="Source1" />
+                                <Edge From="7" To="8" Label="Source1" />
+                              </Edges>
+                            </Workflow>
+                          </Builder>
+                        </Expression>
+                        <Expression xsi:type="GroupWorkflow">
+                          <Name>ArenaAnnotation</Name>
+                          <Workflow>
+                            <Nodes>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaVideoStream</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>MaskedArenaVideo</Selector>
+                              </Expression>
+                              <Expression xsi:type="PropertyMapping">
+                                <PropertyMappings>
+                                  <Property Name="Size" Selector="Size" />
+                                </PropertyMappings>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="drw:CreateCanvas">
+                                  <drw:Size>
+                                    <drw:Width>668</drw:Width>
+                                    <drw:Height>671</drw:Height>
+                                  </drw:Size>
+                                  <drw:Depth>U8</drw:Depth>
+                                  <drw:Channels>3</drw:Channels>
+                                  <drw:Color>
+                                    <drw:Val0>0</drw:Val0>
+                                    <drw:Val1>0</drw:Val1>
+                                    <drw:Val2>0</drw:Val2>
+                                    <drw:Val3>0</drw:Val3>
+                                  </drw:Color>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaVideoStream</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>MaskedArenaVideo</Selector>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:ConvertColor">
+                                  <cv:Conversion>Gray2Bgr</cv:Conversion>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="PropertyMapping">
+                                <PropertyMappings>
+                                  <Property Name="Image" Selector="it" />
+                                </PropertyMappings>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaVideoStream</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>MaskedArenaVideo</Selector>
+                              </Expression>
+                              <Expression xsi:type="PropertyMapping">
+                                <PropertyMappings>
+                                  <Property Name="Destination" Selector="RegionOfInterest" />
+                                </PropertyMappings>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="drw:AddImage">
+                                  <drw:Destination>
+                                    <drw:X>0</drw:X>
+                                    <drw:Y>0</drw:Y>
+                                    <drw:Width>668</drw:Width>
+                                    <drw:Height>671</drw:Height>
+                                  </drw:Destination>
+                                  <drw:Interpolation>Linear</drw:Interpolation>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaVideoStream</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Stimuli.Visual</Selector>
+                              </Expression>
+                              <Expression xsi:type="ipy:PythonTransform">
+                                <ipy:Script>from System import Tuple
+@returns(Tuple[int, int, int, int])
+def process(value):
+  if value == 0:
+    return Tuple.Create(50,50,50, 255)
+  if value == 1:
+    return Tuple.Create(200,200,200, 255)</ipy:Script>
+                              </Expression>
+                              <Expression xsi:type="PropertyMapping">
+                                <PropertyMappings>
+                                  <Property Name="Color" Selector="Item1,Item2,Item3,Item4" />
+                                </PropertyMappings>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="drw:Circle">
+                                  <drw:Center>
+                                    <drw:X>35</drw:X>
+                                    <drw:Y>40</drw:Y>
+                                  </drw:Center>
+                                  <drw:Radius>25</drw:Radius>
+                                  <drw:Color>
+                                    <drw:Val0>50</drw:Val0>
+                                    <drw:Val1>50</drw:Val1>
+                                    <drw:Val2>50</drw:Val2>
+                                    <drw:Val3>255</drw:Val3>
+                                  </drw:Color>
+                                  <drw:Thickness>-1</drw:Thickness>
+                                  <drw:LineType>Connected8</drw:LineType>
+                                  <drw:Shift>0</drw:Shift>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaVideoStream</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Stimuli.Stim0</Selector>
+                              </Expression>
+                              <Expression xsi:type="ipy:PythonTransform">
+                                <ipy:Script>from System import Tuple
+@returns(Tuple[int, int, int, int])
+def process(value):
+  if value == 0:
+    return Tuple.Create(50,50,50, 255)
+  if value == 1:
+    return Tuple.Create(200,200,200, 255)</ipy:Script>
+                              </Expression>
+                              <Expression xsi:type="PropertyMapping">
+                                <PropertyMappings>
+                                  <Property Name="Color" Selector="Item1,Item2,Item3,Item4" />
+                                </PropertyMappings>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="drw:Circle">
+                                  <drw:Center>
+                                    <drw:X>100</drw:X>
+                                    <drw:Y>25</drw:Y>
+                                  </drw:Center>
+                                  <drw:Radius>12</drw:Radius>
+                                  <drw:Color>
+                                    <drw:Val0>50</drw:Val0>
+                                    <drw:Val1>50</drw:Val1>
+                                    <drw:Val2>50</drw:Val2>
+                                    <drw:Val3>255</drw:Val3>
+                                  </drw:Color>
+                                  <drw:Thickness>-1</drw:Thickness>
+                                  <drw:LineType>Connected8</drw:LineType>
+                                  <drw:Shift>0</drw:Shift>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="drw:AddText">
+                                  <drw:Text>0</drw:Text>
+                                  <drw:Alignment>Near</drw:Alignment>
+                                  <drw:LineAlignment>Near</drw:LineAlignment>
+                                  <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
+                                  <drw:Color>
+                                    <drw:Val0>150</drw:Val0>
+                                    <drw:Val1>150</drw:Val1>
+                                    <drw:Val2>150</drw:Val2>
+                                    <drw:Val3>255</drw:Val3>
+                                  </drw:Color>
+                                  <drw:Font>Microsoft Sans Serif, 12pt, style=Bold</drw:Font>
+                                  <drw:Origin>
+                                    <drw:X>65</drw:X>
+                                    <drw:Y>12</drw:Y>
+                                  </drw:Origin>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaVideoStream</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Stimuli.Stim1</Selector>
+                              </Expression>
+                              <Expression xsi:type="ipy:PythonTransform">
+                                <ipy:Script>from System import Tuple
+@returns(Tuple[int, int, int, int])
+def process(value):
+  if value == 0:
+    return Tuple.Create(50,50,50, 255)
+  if value == 1:
+    return Tuple.Create(200,200,200, 255)</ipy:Script>
+                              </Expression>
+                              <Expression xsi:type="PropertyMapping">
+                                <PropertyMappings>
+                                  <Property Name="Color" Selector="Item1,Item2,Item3,Item4" />
+                                </PropertyMappings>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="drw:Circle">
+                                  <drw:Center>
+                                    <drw:X>100</drw:X>
+                                    <drw:Y>55</drw:Y>
+                                  </drw:Center>
+                                  <drw:Radius>12</drw:Radius>
+                                  <drw:Color>
+                                    <drw:Val0>50</drw:Val0>
+                                    <drw:Val1>50</drw:Val1>
+                                    <drw:Val2>50</drw:Val2>
+                                    <drw:Val3>255</drw:Val3>
+                                  </drw:Color>
+                                  <drw:Thickness>-1</drw:Thickness>
+                                  <drw:LineType>Connected8</drw:LineType>
+                                  <drw:Shift>0</drw:Shift>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="drw:AddText">
+                                  <drw:Text>1</drw:Text>
+                                  <drw:Alignment>Near</drw:Alignment>
+                                  <drw:LineAlignment>Near</drw:LineAlignment>
+                                  <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
+                                  <drw:Color>
+                                    <drw:Val0>150</drw:Val0>
+                                    <drw:Val1>150</drw:Val1>
+                                    <drw:Val2>150</drw:Val2>
+                                    <drw:Val3>255</drw:Val3>
+                                  </drw:Color>
+                                  <drw:Font>Microsoft Sans Serif, 12pt, style=Bold</drw:Font>
+                                  <drw:Origin>
+                                    <drw:X>65</drw:X>
+                                    <drw:Y>42</drw:Y>
+                                  </drw:Origin>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="drw:DrawCanvas" />
+                              </Expression>
+                              <Expression xsi:type="rx:PublishSubject">
+                                <Name>ArenaAnnotation</Name>
+                              </Expression>
+                              <Expression xsi:type="WorkflowOutput" />
+                            </Nodes>
+                            <Edges>
+                              <Edge From="0" To="1" Label="Source1" />
+                              <Edge From="1" To="2" Label="Source1" />
+                              <Edge From="1" To="3" Label="Source1" />
+                              <Edge From="2" To="3" Label="Source2" />
+                              <Edge From="3" To="11" Label="Source1" />
+                              <Edge From="4" To="5" Label="Source1" />
+                              <Edge From="5" To="6" Label="Source1" />
+                              <Edge From="6" To="7" Label="Source1" />
+                              <Edge From="7" To="11" Label="Source2" />
+                              <Edge From="8" To="9" Label="Source1" />
+                              <Edge From="9" To="10" Label="Source1" />
+                              <Edge From="10" To="11" Label="Source3" />
+                              <Edge From="11" To="16" Label="Source1" />
+                              <Edge From="12" To="13" Label="Source1" />
+                              <Edge From="13" To="14" Label="Source1" />
+                              <Edge From="14" To="15" Label="Source1" />
+                              <Edge From="15" To="16" Label="Source2" />
+                              <Edge From="16" To="21" Label="Source1" />
+                              <Edge From="17" To="18" Label="Source1" />
+                              <Edge From="18" To="19" Label="Source1" />
+                              <Edge From="19" To="20" Label="Source1" />
+                              <Edge From="20" To="21" Label="Source2" />
+                              <Edge From="21" To="22" Label="Source1" />
+                              <Edge From="22" To="27" Label="Source1" />
+                              <Edge From="23" To="24" Label="Source1" />
+                              <Edge From="24" To="25" Label="Source1" />
+                              <Edge From="25" To="26" Label="Source1" />
+                              <Edge From="26" To="27" Label="Source2" />
+                              <Edge From="27" To="28" Label="Source1" />
+                              <Edge From="28" To="29" Label="Source1" />
+                              <Edge From="29" To="30" Label="Source1" />
+                              <Edge From="30" To="31" Label="Source1" />
+                            </Edges>
+                          </Workflow>
+                        </Expression>
+                        <Expression xsi:type="GroupWorkflow">
+                          <Name>LoggingTracked</Name>
+                          <Workflow>
+                            <Nodes>
+                              <Expression xsi:type="GroupWorkflow">
+                                <Name>ArenaPNG</Name>
+                                <Workflow>
+                                  <Nodes>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>ArenaVideoStream</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>MaskedArenaFrame</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>SessionPaths</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>PostProcessingPath</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="Add">
+                                      <Operand xsi:type="StringProperty">
+                                        <Value>\Arenas</Value>
+                                      </Operand>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>SessionPaths</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>FileName</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>ArenaIndex</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:Zip" />
+                                    </Expression>
+                                    <Expression xsi:type="Format">
+                                      <Format>{0}/{1}_fly{2}.png</Format>
+                                      <Selector>Item1,Item2,Item3</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:WithLatestFrom" />
+                                    </Expression>
+                                    <Expression xsi:type="InputMapping">
+                                      <PropertyMappings>
+                                        <Property Name="FileName" Selector="Item2" />
+                                      </PropertyMappings>
+                                      <Selector>Item1</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="cv:SaveImage">
+                                        <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\PostProcessing\Arenas/MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamB-2025-08-26T12_12_47_fly3.png</cv:FileName>
+                                        <cv:Suffix>None</cv:Suffix>
+                                      </Combinator>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:Take">
+                                        <rx:Count>1</rx:Count>
+                                      </Combinator>
+                                    </Expression>
+                                    <Expression xsi:type="WorkflowOutput" />
+                                  </Nodes>
+                                  <Edges>
+                                    <Edge From="0" To="1" Label="Source1" />
+                                    <Edge From="1" To="10" Label="Source1" />
+                                    <Edge From="2" To="3" Label="Source1" />
+                                    <Edge From="3" To="4" Label="Source1" />
+                                    <Edge From="4" To="8" Label="Source1" />
+                                    <Edge From="5" To="6" Label="Source1" />
+                                    <Edge From="6" To="8" Label="Source2" />
+                                    <Edge From="7" To="8" Label="Source3" />
+                                    <Edge From="8" To="9" Label="Source1" />
+                                    <Edge From="9" To="10" Label="Source2" />
+                                    <Edge From="10" To="11" Label="Source1" />
+                                    <Edge From="11" To="12" Label="Source1" />
+                                    <Edge From="12" To="13" Label="Source1" />
+                                    <Edge From="13" To="14" Label="Source1" />
+                                  </Edges>
+                                </Workflow>
+                              </Expression>
+                              <Expression xsi:type="GroupWorkflow">
+                                <Name>TrackedCSV</Name>
+                                <Workflow>
+                                  <Nodes>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>SessionPaths</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>PostProcessingPath</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="Add">
+                                      <Operand xsi:type="StringProperty">
+                                        <Value>\Tracked</Value>
+                                      </Operand>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>SessionPaths</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>FileName</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>ArenaIndex</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:Zip" />
+                                    </Expression>
+                                    <Expression xsi:type="Format">
+                                      <Format>{0}/{1}_fly{2}_tracked.csv</Format>
+                                      <Selector>Item1,Item2,Item3</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="PropertyMapping">
+                                      <PropertyMappings>
+                                        <Property Name="FileName" />
+                                      </PropertyMappings>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>Video&amp;Stimuli</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>FrameCount_Video</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>ArenaVideoStream</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>Stimuli.Visual,Stimuli.Stim0,Stimuli.Stim1,Stimuli.FrameID,Stimuli.FrameTimeStamp</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>NormalizedBestCentroid</Name>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>PixelChange</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:Zip" />
+                                    </Expression>
+                                    <Expression xsi:type="scr:ExpressionTransform">
+                                      <scr:Name>Header</scr:Name>
+                                      <scr:Expression>new(
+Item2.Item4 as FrameID,
+Item2.Item5 as FrameTimeStamp,
+Item1 as FrameIndex,
+Item2.Item1 as VisualStim,
+Item2.Item2 as Stim0,
+Item2.Item3 as Stim1,
+Item3.X as NormalizedCentroidX, 
+Item3.Y as NormalizedCentroidY, 
+Item4 as PixelChange
+)</scr:Expression>
+                                    </Expression>
+                                    <Expression xsi:type="io:CsvWriter">
+                                      <io:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\PostProcessing\Tracked/MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamB-2025-08-26T12_12_47_fly3_tracked.csv</io:FileName>
+                                      <io:Append>false</io:Append>
+                                      <io:Overwrite>false</io:Overwrite>
+                                      <io:Suffix>None</io:Suffix>
+                                      <io:IncludeHeader>true</io:IncludeHeader>
+                                    </Expression>
+                                    <Expression xsi:type="WorkflowOutput" />
+                                  </Nodes>
+                                  <Edges>
+                                    <Edge From="0" To="1" Label="Source1" />
+                                    <Edge From="1" To="2" Label="Source1" />
+                                    <Edge From="2" To="6" Label="Source1" />
+                                    <Edge From="3" To="4" Label="Source1" />
+                                    <Edge From="4" To="6" Label="Source2" />
+                                    <Edge From="5" To="6" Label="Source3" />
+                                    <Edge From="6" To="7" Label="Source1" />
+                                    <Edge From="7" To="8" Label="Source1" />
+                                    <Edge From="8" To="17" Label="Source1" />
+                                    <Edge From="9" To="10" Label="Source1" />
+                                    <Edge From="10" To="15" Label="Source1" />
+                                    <Edge From="11" To="12" Label="Source1" />
+                                    <Edge From="12" To="15" Label="Source2" />
+                                    <Edge From="13" To="15" Label="Source3" />
+                                    <Edge From="14" To="15" Label="Source4" />
+                                    <Edge From="15" To="16" Label="Source1" />
+                                    <Edge From="16" To="17" Label="Source2" />
+                                    <Edge From="17" To="18" Label="Source1" />
+                                  </Edges>
+                                </Workflow>
+                              </Expression>
+                              <Expression xsi:type="GroupWorkflow">
+                                <Name>ArenaVideo</Name>
+                                <Workflow>
+                                  <Nodes>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>ArenaAnnotation</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="cv:Grayscale" />
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>SessionPaths</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>PostProcessingPath</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="Add">
+                                      <Operand xsi:type="StringProperty">
+                                        <Value>\ArenaVideos</Value>
+                                      </Operand>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>SessionPaths</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>FileName</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>ArenaIndex</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:Zip" />
+                                    </Expression>
+                                    <Expression xsi:type="Format">
+                                      <Format>{0}/{1}_fly{2}.avi</Format>
+                                      <Selector>Item1,Item2,Item3</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="PropertyMapping">
+                                      <PropertyMappings>
+                                        <Property Name="FileName" />
+                                      </PropertyMappings>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>FrameRate</Name>
+                                    </Expression>
+                                    <Expression xsi:type="PropertyMapping">
+                                      <PropertyMappings>
+                                        <Property Name="FrameRate" />
+                                      </PropertyMappings>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="cv:VideoWriter">
+                                        <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\PostProcessing\ArenaVideos/MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamB-2025-08-26T12_12_47_fly3.avi</cv:FileName>
+                                        <cv:Suffix>FileCount</cv:Suffix>
+                                        <cv:Buffered>true</cv:Buffered>
+                                        <cv:Overwrite>false</cv:Overwrite>
+                                        <cv:FourCC>FMP4</cv:FourCC>
+                                        <cv:FrameRate>60</cv:FrameRate>
+                                        <cv:FrameSize>
+                                          <cv:Width>0</cv:Width>
+                                          <cv:Height>0</cv:Height>
+                                        </cv:FrameSize>
+                                        <cv:ResizeInterpolation>NearestNeighbor</cv:ResizeInterpolation>
+                                      </Combinator>
+                                    </Expression>
+                                    <Expression xsi:type="WorkflowOutput" />
+                                  </Nodes>
+                                  <Edges>
+                                    <Edge From="0" To="1" Label="Source1" />
+                                    <Edge From="1" To="13" Label="Source1" />
+                                    <Edge From="2" To="3" Label="Source1" />
+                                    <Edge From="3" To="4" Label="Source1" />
+                                    <Edge From="4" To="8" Label="Source1" />
+                                    <Edge From="5" To="6" Label="Source1" />
+                                    <Edge From="6" To="8" Label="Source2" />
+                                    <Edge From="7" To="8" Label="Source3" />
+                                    <Edge From="8" To="9" Label="Source1" />
+                                    <Edge From="9" To="10" Label="Source1" />
+                                    <Edge From="10" To="13" Label="Source2" />
+                                    <Edge From="11" To="12" Label="Source1" />
+                                    <Edge From="12" To="13" Label="Source3" />
+                                    <Edge From="13" To="14" Label="Source1" />
+                                  </Edges>
+                                </Workflow>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>SaveArenaVideo</Name>
+                              </Expression>
+                              <Expression xsi:type="rx:Condition">
+                                <Workflow>
+                                  <Nodes>
+                                    <Expression xsi:type="WorkflowInput">
+                                      <Name>Source1</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Equal">
+                                      <Operand xsi:type="BooleanProperty">
+                                        <Value>true</Value>
+                                      </Operand>
+                                    </Expression>
+                                    <Expression xsi:type="WorkflowOutput" />
+                                  </Nodes>
+                                  <Edges>
+                                    <Edge From="0" To="1" Label="Source1" />
+                                    <Edge From="1" To="2" Label="Source1" />
+                                  </Edges>
+                                </Workflow>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:SubscribeWhen" />
+                              </Expression>
+                              <Expression xsi:type="GroupWorkflow">
+                                <Name>CropRawVideo</Name>
+                                <Workflow>
+                                  <Nodes>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>CenteredVideo</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="cv:Grayscale" />
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>SessionPaths</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>PostProcessingPath</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="Add">
+                                      <Operand xsi:type="StringProperty">
+                                        <Value>\CropRaw</Value>
+                                      </Operand>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>SessionPaths</Name>
+                                    </Expression>
+                                    <Expression xsi:type="MemberSelector">
+                                      <Selector>FileName</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>ArenaIndex</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="rx:Zip" />
+                                    </Expression>
+                                    <Expression xsi:type="Format">
+                                      <Format>{0}/{1}_fly{2}.avi</Format>
+                                      <Selector>Item1,Item2,Item3</Selector>
+                                    </Expression>
+                                    <Expression xsi:type="PropertyMapping">
+                                      <PropertyMappings>
+                                        <Property Name="FileName" />
+                                      </PropertyMappings>
+                                    </Expression>
+                                    <Expression xsi:type="SubscribeSubject">
+                                      <Name>FrameRate</Name>
+                                    </Expression>
+                                    <Expression xsi:type="PropertyMapping">
+                                      <PropertyMappings>
+                                        <Property Name="FrameRate" />
+                                      </PropertyMappings>
+                                    </Expression>
+                                    <Expression xsi:type="Combinator">
+                                      <Combinator xsi:type="cv:VideoWriter">
+                                        <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\PostProcessing\CropRaw/MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamB-2025-08-26T12_12_47_fly3.avi</cv:FileName>
+                                        <cv:Suffix>FileCount</cv:Suffix>
+                                        <cv:Buffered>true</cv:Buffered>
+                                        <cv:Overwrite>false</cv:Overwrite>
+                                        <cv:FourCC>FMP4</cv:FourCC>
+                                        <cv:FrameRate>60</cv:FrameRate>
+                                        <cv:FrameSize>
+                                          <cv:Width>0</cv:Width>
+                                          <cv:Height>0</cv:Height>
+                                        </cv:FrameSize>
+                                        <cv:ResizeInterpolation>NearestNeighbor</cv:ResizeInterpolation>
+                                      </Combinator>
+                                    </Expression>
+                                    <Expression xsi:type="WorkflowOutput" />
+                                  </Nodes>
+                                  <Edges>
+                                    <Edge From="0" To="1" Label="Source1" />
+                                    <Edge From="1" To="13" Label="Source1" />
+                                    <Edge From="2" To="3" Label="Source1" />
+                                    <Edge From="3" To="4" Label="Source1" />
+                                    <Edge From="4" To="8" Label="Source1" />
+                                    <Edge From="5" To="6" Label="Source1" />
+                                    <Edge From="6" To="8" Label="Source2" />
+                                    <Edge From="7" To="8" Label="Source3" />
+                                    <Edge From="8" To="9" Label="Source1" />
+                                    <Edge From="9" To="10" Label="Source1" />
+                                    <Edge From="10" To="13" Label="Source2" />
+                                    <Edge From="11" To="12" Label="Source1" />
+                                    <Edge From="12" To="13" Label="Source3" />
+                                    <Edge From="13" To="14" Label="Source1" />
+                                  </Edges>
+                                </Workflow>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>SaveCropRaw</Name>
+                              </Expression>
+                              <Expression xsi:type="rx:Condition">
+                                <Workflow>
+                                  <Nodes>
+                                    <Expression xsi:type="WorkflowInput">
+                                      <Name>Source1</Name>
+                                    </Expression>
+                                    <Expression xsi:type="Equal">
+                                      <Operand xsi:type="BooleanProperty">
+                                        <Value>true</Value>
+                                      </Operand>
+                                    </Expression>
+                                    <Expression xsi:type="WorkflowOutput" />
+                                  </Nodes>
+                                  <Edges>
+                                    <Edge From="0" To="1" Label="Source1" />
+                                    <Edge From="1" To="2" Label="Source1" />
+                                  </Edges>
+                                </Workflow>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:SubscribeWhen" />
+                              </Expression>
+                              <Expression xsi:type="Disable">
+                                <Builder xsi:type="GroupWorkflow">
+                                  <Name>CropSubtractedVideo</Name>
+                                  <Workflow>
+                                    <Nodes>
+                                      <Expression xsi:type="SubscribeSubject">
+                                        <Name>CenteredVideoBackSub</Name>
+                                      </Expression>
+                                      <Expression xsi:type="Combinator">
+                                        <Combinator xsi:type="cv:Grayscale" />
+                                      </Expression>
+                                      <Expression xsi:type="SubscribeSubject">
+                                        <Name>SessionPaths</Name>
+                                      </Expression>
+                                      <Expression xsi:type="MemberSelector">
+                                        <Selector>PostProcessingPath</Selector>
+                                      </Expression>
+                                      <Expression xsi:type="Add">
+                                        <Operand xsi:type="StringProperty">
+                                          <Value>\CropSubtracted</Value>
+                                        </Operand>
+                                      </Expression>
+                                      <Expression xsi:type="SubscribeSubject">
+                                        <Name>SessionPaths</Name>
+                                      </Expression>
+                                      <Expression xsi:type="MemberSelector">
+                                        <Selector>FileName</Selector>
+                                      </Expression>
+                                      <Expression xsi:type="SubscribeSubject">
+                                        <Name>ArenaIndex</Name>
+                                      </Expression>
+                                      <Expression xsi:type="Combinator">
+                                        <Combinator xsi:type="rx:Zip" />
+                                      </Expression>
+                                      <Expression xsi:type="Format">
+                                        <Format>{0}/{1}_fly{2}.avi</Format>
+                                        <Selector>Item1,Item2,Item3</Selector>
+                                      </Expression>
+                                      <Expression xsi:type="PropertyMapping">
+                                        <PropertyMappings>
+                                          <Property Name="FileName" />
+                                        </PropertyMappings>
+                                      </Expression>
+                                      <Expression xsi:type="SubscribeSubject">
+                                        <Name>FrameRate</Name>
+                                      </Expression>
+                                      <Expression xsi:type="PropertyMapping">
+                                        <PropertyMappings>
+                                          <Property Name="FrameRate" />
+                                        </PropertyMappings>
+                                      </Expression>
+                                      <Expression xsi:type="Combinator">
+                                        <Combinator xsi:type="cv:VideoWriter">
+                                          <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\Test 290 3MP\PostProcessing\CropSubtracted/MF-Mix-TestLoomOpto-Female-4to6days-FH1-CamA-2025-08-26T11_21_10_fly2.avi</cv:FileName>
+                                          <cv:Suffix>FileCount</cv:Suffix>
+                                          <cv:Buffered>true</cv:Buffered>
+                                          <cv:Overwrite>false</cv:Overwrite>
+                                          <cv:FourCC>FMP4</cv:FourCC>
+                                          <cv:FrameRate>60</cv:FrameRate>
+                                          <cv:FrameSize>
+                                            <cv:Width>0</cv:Width>
+                                            <cv:Height>0</cv:Height>
+                                          </cv:FrameSize>
+                                          <cv:ResizeInterpolation>NearestNeighbor</cv:ResizeInterpolation>
+                                        </Combinator>
+                                      </Expression>
+                                      <Expression xsi:type="WorkflowOutput" />
+                                    </Nodes>
+                                    <Edges>
+                                      <Edge From="0" To="1" Label="Source1" />
+                                      <Edge From="1" To="13" Label="Source1" />
+                                      <Edge From="2" To="3" Label="Source1" />
+                                      <Edge From="3" To="4" Label="Source1" />
+                                      <Edge From="4" To="8" Label="Source1" />
+                                      <Edge From="5" To="6" Label="Source1" />
+                                      <Edge From="6" To="8" Label="Source2" />
+                                      <Edge From="7" To="8" Label="Source3" />
+                                      <Edge From="8" To="9" Label="Source1" />
+                                      <Edge From="9" To="10" Label="Source1" />
+                                      <Edge From="10" To="13" Label="Source2" />
+                                      <Edge From="11" To="12" Label="Source1" />
+                                      <Edge From="12" To="13" Label="Source3" />
+                                      <Edge From="13" To="14" Label="Source1" />
+                                    </Edges>
+                                  </Workflow>
+                                </Builder>
+                              </Expression>
+                              <Expression xsi:type="Disable">
+                                <Builder xsi:type="SubscribeSubject">
+                                  <Name>SaveCropSubtracted</Name>
+                                </Builder>
+                              </Expression>
+                              <Expression xsi:type="Disable">
+                                <Builder xsi:type="rx:Condition">
+                                  <Workflow>
+                                    <Nodes>
+                                      <Expression xsi:type="WorkflowInput">
+                                        <Name>Source1</Name>
+                                      </Expression>
+                                      <Expression xsi:type="Equal">
+                                        <Operand xsi:type="BooleanProperty">
+                                          <Value>true</Value>
+                                        </Operand>
+                                      </Expression>
+                                      <Expression xsi:type="WorkflowOutput" />
+                                    </Nodes>
+                                    <Edges>
+                                      <Edge From="0" To="1" Label="Source1" />
+                                      <Edge From="1" To="2" Label="Source1" />
+                                    </Edges>
+                                  </Workflow>
+                                </Builder>
+                              </Expression>
+                              <Expression xsi:type="Disable">
+                                <Builder xsi:type="Combinator">
+                                  <Combinator xsi:type="rx:SubscribeWhen" />
+                                </Builder>
+                              </Expression>
+                            </Nodes>
+                            <Edges>
+                              <Edge From="2" To="5" Label="Source1" />
+                              <Edge From="3" To="4" Label="Source1" />
+                              <Edge From="4" To="5" Label="Source2" />
+                              <Edge From="6" To="9" Label="Source1" />
+                              <Edge From="7" To="8" Label="Source1" />
+                              <Edge From="8" To="9" Label="Source2" />
+                              <Edge From="10" To="13" Label="Source1" />
+                              <Edge From="11" To="12" Label="Source1" />
+                              <Edge From="12" To="13" Label="Source2" />
+                            </Edges>
+                          </Workflow>
+                        </Expression>
+                        <Expression xsi:type="GroupWorkflow">
+                          <Name>VisualizerOut</Name>
+                          <Workflow>
+                            <Nodes>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>CenteredVideo</Name>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>Video&amp;Stimuli</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>FrameCount_Video</Selector>
+                              </Expression>
+                              <Expression xsi:type="scr:ExpressionTransform">
+                                <scr:Name>Header</scr:Name>
+                                <scr:Expression>new(it as FrameCount_ArenaStream)</scr:Expression>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Stimuli</Selector>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaAnnotation</Name>
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>PixelChange</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Zip" />
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>ArenaIndex</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:WithLatestFrom" />
+                              </Expression>
+                              <Expression xsi:type="SubscribeSubject">
+                                <Name>SessionPaths</Name>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>FileName</Selector>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:WithLatestFrom" />
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Item1.Item2</Selector>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Item1.Item1.Item1</Selector>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Item1.Item1.Item2</Selector>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Item1.Item1.Item3</Selector>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Item2</Selector>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Item1.Item1.Item4</Selector>
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Item1.Item1.Item5</Selector>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Zip" />
+                              </Expression>
+                              <Expression xsi:type="scr:ExpressionTransform">
+                                <scr:Name>Rename</scr:Name>
+                                <scr:Expression>new(
+Item1 as ArenaIndex,
+Item2 as CenteredVideo,
+Item3 as FrameCount,
+Item4 as Stimuli,
+Item5 as Filename,
+Item6 as ArenaAnnotation,
+Item7 as PixelChange
+)</scr:Expression>
+                              </Expression>
+                              <Expression xsi:type="WorkflowOutput" />
+                            </Nodes>
+                            <Edges>
+                              <Edge From="0" To="7" Label="Source1" />
+                              <Edge From="1" To="2" Label="Source1" />
+                              <Edge From="1" To="4" Label="Source1" />
+                              <Edge From="2" To="3" Label="Source1" />
+                              <Edge From="3" To="7" Label="Source2" />
+                              <Edge From="4" To="7" Label="Source3" />
+                              <Edge From="5" To="7" Label="Source4" />
+                              <Edge From="6" To="7" Label="Source5" />
+                              <Edge From="7" To="9" Label="Source1" />
+                              <Edge From="8" To="9" Label="Source2" />
+                              <Edge From="9" To="12" Label="Source1" />
+                              <Edge From="10" To="11" Label="Source1" />
+                              <Edge From="11" To="12" Label="Source2" />
+                              <Edge From="12" To="13" Label="Source1" />
+                              <Edge From="12" To="14" Label="Source1" />
+                              <Edge From="12" To="15" Label="Source1" />
+                              <Edge From="12" To="16" Label="Source1" />
+                              <Edge From="12" To="17" Label="Source1" />
+                              <Edge From="12" To="18" Label="Source1" />
+                              <Edge From="12" To="19" Label="Source1" />
+                              <Edge From="13" To="20" Label="Source1" />
+                              <Edge From="14" To="20" Label="Source2" />
+                              <Edge From="15" To="20" Label="Source3" />
+                              <Edge From="16" To="20" Label="Source4" />
+                              <Edge From="17" To="20" Label="Source5" />
+                              <Edge From="18" To="20" Label="Source6" />
+                              <Edge From="19" To="20" Label="Source7" />
+                              <Edge From="20" To="21" Label="Source1" />
+                              <Edge From="21" To="22" Label="Source1" />
+                            </Edges>
+                          </Workflow>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source1" />
+                        <Edge From="3" To="4" Label="Source1" />
+                        <Edge From="4" To="5" Label="Source1" />
+                        <Edge From="6" To="7" Label="Source1" />
+                        <Edge From="7" To="8" Label="Source1" />
+                        <Edge From="8" To="9" Label="Source1" />
+                        <Edge From="16" To="17" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Merge" />
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="10" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="8" To="10" Label="Source2" />
+            <Edge From="9" To="10" Label="Source3" />
+            <Edge From="12" To="13" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:Concat" />
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>Visualizers</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="WorkflowInput">
+              <Name>Source1</Name>
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>Parse</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="WorkflowInput">
+                    <Name>Source1</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:Condition">
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>ArenaIndex</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" DisplayName="Arena" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>0</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>Output</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:Condition">
+                    <Name>Arena1</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>ArenaIndex</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" DisplayName="Arena" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>0</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>Arena1</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:Condition">
+                    <Name>Arena2</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>ArenaIndex</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" DisplayName="Arena" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>1</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>Arena2</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:Condition">
+                    <Name>Arena3</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>ArenaIndex</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" DisplayName="Arena" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>2</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>Arena3</Name>
+                  </Expression>
+                  <Expression xsi:type="rx:Condition">
+                    <Name>Arena4</Name>
+                    <Workflow>
+                      <Nodes>
+                        <Expression xsi:type="WorkflowInput">
+                          <Name>Source1</Name>
+                        </Expression>
+                        <Expression xsi:type="MemberSelector">
+                          <Selector>ArenaIndex</Selector>
+                        </Expression>
+                        <Expression xsi:type="ExternalizedMapping">
+                          <Property Name="Value" DisplayName="Arena" />
+                        </Expression>
+                        <Expression xsi:type="Equal">
+                          <Operand xsi:type="IntProperty">
+                            <Value>3</Value>
+                          </Operand>
+                        </Expression>
+                        <Expression xsi:type="WorkflowOutput" />
+                      </Nodes>
+                      <Edges>
+                        <Edge From="0" To="1" Label="Source1" />
+                        <Edge From="1" To="3" Label="Source1" />
+                        <Edge From="2" To="3" Label="Source2" />
+                        <Edge From="3" To="4" Label="Source1" />
+                      </Edges>
+                    </Workflow>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>Arena4</Name>
+                  </Expression>
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="0" To="3" Label="Source1" />
+                  <Edge From="0" To="5" Label="Source1" />
+                  <Edge From="0" To="7" Label="Source1" />
+                  <Edge From="0" To="9" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="7" To="8" Label="Source1" />
+                  <Edge From="9" To="10" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Output</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>FrameCount</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:TakeLast">
+                <rx:Count>1</rx:Count>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>LastFrame</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Output</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Filename</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:DistinctUntilChanged" />
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="ui:ObjectTextVisualizer" />
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>VirtualLED</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Arena1</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>CenteredVideo</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:CreateCanvas">
+                      <drw:Size>
+                        <drw:Width>600</drw:Width>
+                        <drw:Height>210</drw:Height>
+                      </drw:Size>
+                      <drw:Depth>U8</drw:Depth>
+                      <drw:Channels>3</drw:Channels>
+                      <drw:Color>
+                        <drw:Val0>0</drw:Val0>
+                        <drw:Val1>0</drw:Val1>
+                        <drw:Val2>0</drw:Val2>
+                        <drw:Val3>0</drw:Val3>
+                      </drw:Color>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Output</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Stimuli.Visual</Selector>
+                  </Expression>
+                  <Expression xsi:type="ipy:PythonTransform">
+                    <ipy:Script>from System import Tuple
+@returns(Tuple[int, int, int, int])
+def process(value):
+  if value == 0:
+    return Tuple.Create(50,50,50, 255)
+  if value == 1:
+    return Tuple.Create(200,200,200, 255)</ipy:Script>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="Color" Selector="Item1,Item2,Item3,Item4" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:Circle">
+                      <drw:Center>
+                        <drw:X>110</drw:X>
+                        <drw:Y>125</drw:Y>
+                      </drw:Center>
+                      <drw:Radius>70</drw:Radius>
+                      <drw:Color>
+                        <drw:Val0>50</drw:Val0>
+                        <drw:Val1>50</drw:Val1>
+                        <drw:Val2>50</drw:Val2>
+                        <drw:Val3>255</drw:Val3>
+                      </drw:Color>
+                      <drw:Thickness>-1</drw:Thickness>
+                      <drw:LineType>Connected8</drw:LineType>
+                      <drw:Shift>0</drw:Shift>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:AddText">
+                      <drw:Text>Visual</drw:Text>
+                      <drw:Alignment>Near</drw:Alignment>
+                      <drw:LineAlignment>Near</drw:LineAlignment>
+                      <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
+                      <drw:Color>
+                        <drw:Val0>255</drw:Val0>
+                        <drw:Val1>255</drw:Val1>
+                        <drw:Val2>255</drw:Val2>
+                        <drw:Val3>255</drw:Val3>
+                      </drw:Color>
+                      <drw:Font>Microsoft Sans Serif, 20pt</drw:Font>
+                      <drw:Origin>
+                        <drw:X>47</drw:X>
+                        <drw:Y>5</drw:Y>
+                      </drw:Origin>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Output</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Stimuli.Stim0</Selector>
+                  </Expression>
+                  <Expression xsi:type="ipy:PythonTransform">
+                    <ipy:Script>from System import Tuple
+@returns(Tuple[int, int, int, int])
+def process(value):
+  if value == 0:
+    return Tuple.Create(50,50,50, 255)
+  if value == 1:
+    return Tuple.Create(50,50,200, 255)</ipy:Script>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="Color" Selector="Item1,Item2,Item3,Item4" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:Circle">
+                      <drw:Center>
+                        <drw:X>300</drw:X>
+                        <drw:Y>125</drw:Y>
+                      </drw:Center>
+                      <drw:Radius>70</drw:Radius>
+                      <drw:Color>
+                        <drw:Val0>50</drw:Val0>
+                        <drw:Val1>50</drw:Val1>
+                        <drw:Val2>50</drw:Val2>
+                        <drw:Val3>255</drw:Val3>
+                      </drw:Color>
+                      <drw:Thickness>-1</drw:Thickness>
+                      <drw:LineType>Connected8</drw:LineType>
+                      <drw:Shift>0</drw:Shift>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:AddText">
+                      <drw:Text>Stim0</drw:Text>
+                      <drw:Alignment>Near</drw:Alignment>
+                      <drw:LineAlignment>Near</drw:LineAlignment>
+                      <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
+                      <drw:Color>
+                        <drw:Val0>255</drw:Val0>
+                        <drw:Val1>255</drw:Val1>
+                        <drw:Val2>255</drw:Val2>
+                        <drw:Val3>255</drw:Val3>
+                      </drw:Color>
+                      <drw:Font>Microsoft Sans Serif, 20pt</drw:Font>
+                      <drw:Origin>
+                        <drw:X>243</drw:X>
+                        <drw:Y>5</drw:Y>
+                      </drw:Origin>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Output</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Stimuli.Stim1</Selector>
+                  </Expression>
+                  <Expression xsi:type="ipy:PythonTransform">
+                    <ipy:Script>from System import Tuple
+@returns(Tuple[int, int, int, int])
+def process(value):
+  if value == 0:
+    return Tuple.Create(50,50,50, 255)
+  if value == 1:
+    return Tuple.Create(200,200,50, 255)</ipy:Script>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="Color" Selector="Item1,Item2,Item3,Item4" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:Circle">
+                      <drw:Center>
+                        <drw:X>480</drw:X>
+                        <drw:Y>125</drw:Y>
+                      </drw:Center>
+                      <drw:Radius>70</drw:Radius>
+                      <drw:Color>
+                        <drw:Val0>50</drw:Val0>
+                        <drw:Val1>50</drw:Val1>
+                        <drw:Val2>50</drw:Val2>
+                        <drw:Val3>255</drw:Val3>
+                      </drw:Color>
+                      <drw:Thickness>-1</drw:Thickness>
+                      <drw:LineType>Connected8</drw:LineType>
+                      <drw:Shift>0</drw:Shift>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:AddText">
+                      <drw:Text>Stim1</drw:Text>
+                      <drw:Alignment>Near</drw:Alignment>
+                      <drw:LineAlignment>Near</drw:LineAlignment>
+                      <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
+                      <drw:Color>
+                        <drw:Val0>255</drw:Val0>
+                        <drw:Val1>255</drw:Val1>
+                        <drw:Val2>255</drw:Val2>
+                        <drw:Val3>255</drw:Val3>
+                      </drw:Color>
+                      <drw:Font>Microsoft Sans Serif, 20pt</drw:Font>
+                      <drw:Origin>
+                        <drw:X>423</drw:X>
+                        <drw:Y>5</drw:Y>
+                      </drw:Origin>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:DrawCanvas" />
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="7" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="6" To="7" Label="Source2" />
+                  <Edge From="7" To="8" Label="Source1" />
+                  <Edge From="8" To="13" Label="Source1" />
+                  <Edge From="9" To="10" Label="Source1" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="11" To="12" Label="Source1" />
+                  <Edge From="12" To="13" Label="Source2" />
+                  <Edge From="13" To="14" Label="Source1" />
+                  <Edge From="14" To="19" Label="Source1" />
+                  <Edge From="15" To="16" Label="Source1" />
+                  <Edge From="16" To="17" Label="Source1" />
+                  <Edge From="17" To="18" Label="Source1" />
+                  <Edge From="18" To="19" Label="Source2" />
+                  <Edge From="19" To="20" Label="Source1" />
+                  <Edge From="20" To="21" Label="Source1" />
+                  <Edge From="21" To="22" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
+            </Expression>
+            <Expression xsi:type="GroupWorkflow">
+              <Name>TimeCount</Name>
+              <Workflow>
+                <Nodes>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Output</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Filename</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:DistinctUntilChanged" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:ElementIndex" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Index</Selector>
+                  </Expression>
+                  <Expression xsi:type="Add">
+                    <Operand xsi:type="IntProperty">
+                      <Value>1</Value>
+                    </Operand>
+                  </Expression>
+                  <Expression xsi:type="Format">
+                    <Format>File:      {0} </Format>
+                    <Selector>it</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>FileNumber</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Output</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>FrameCount.FrameCount_ArenaStream</Selector>
+                  </Expression>
+                  <Expression xsi:type="Format">
+                    <Format>Frame: {0}</Format>
+                    <Selector>it</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>FrameCount</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Output</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Filename</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:TimeInterval" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Interval.TotalSeconds</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:Accumulate" />
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Name />
+                    <scr:Expression>TimeSpan.FromSeconds(it)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="Format">
+                    <Format>Time:   {0} </Format>
+                    <Selector>it</Selector>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>FileNumber</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:SubscribeWhen" />
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>SessionTimer</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Output</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Filename</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:TimeInterval" />
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>Interval.TotalSeconds</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:Accumulate" />
+                  <Expression xsi:type="scr:ExpressionTransform">
+                    <scr:Name />
+                    <scr:Expression>TimeSpan.FromSeconds(it)</scr:Expression>
+                  </Expression>
+                  <Expression xsi:type="Format">
+                    <Format>File:   {0} </Format>
+                    <Selector>it</Selector>
+                  </Expression>
+                  <Expression xsi:type="rx:PublishSubject">
+                    <Name>FileTimer</Name>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>FileNumber</Name>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:TakeUntil" />
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="rx:Repeat" />
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>Arena1</Name>
+                  </Expression>
+                  <Expression xsi:type="MemberSelector">
+                    <Selector>CenteredVideo</Selector>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:CreateCanvas">
+                      <drw:Size>
+                        <drw:Width>1500</drw:Width>
+                        <drw:Height>210</drw:Height>
+                      </drw:Size>
+                      <drw:Depth>U8</drw:Depth>
+                      <drw:Channels>3</drw:Channels>
+                      <drw:Color>
+                        <drw:Val0>32</drw:Val0>
+                        <drw:Val1>32</drw:Val1>
+                        <drw:Val2>32</drw:Val2>
+                        <drw:Val3>0</drw:Val3>
+                      </drw:Color>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>FileNumber</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="Text" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:AddText">
+                      <drw:Text>File:      5 </drw:Text>
+                      <drw:Alignment>Near</drw:Alignment>
+                      <drw:LineAlignment>Near</drw:LineAlignment>
+                      <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
+                      <drw:Color>
+                        <drw:Val0>200</drw:Val0>
+                        <drw:Val1>200</drw:Val1>
+                        <drw:Val2>200</drw:Val2>
+                        <drw:Val3>255</drw:Val3>
+                      </drw:Color>
+                      <drw:Font>Microsoft Sans Serif, 48pt</drw:Font>
+                      <drw:Origin>
+                        <drw:X>30</drw:X>
+                        <drw:Y>5</drw:Y>
+                      </drw:Origin>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>FrameCount</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="Text" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:AddText">
+                      <drw:Text>Frame: 36599</drw:Text>
+                      <drw:Alignment>Near</drw:Alignment>
+                      <drw:LineAlignment>Near</drw:LineAlignment>
+                      <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
+                      <drw:Color>
+                        <drw:Val0>200</drw:Val0>
+                        <drw:Val1>200</drw:Val1>
+                        <drw:Val2>200</drw:Val2>
+                        <drw:Val3>255</drw:Val3>
+                      </drw:Color>
+                      <drw:Font>Microsoft Sans Serif, 48pt</drw:Font>
+                      <drw:Origin>
+                        <drw:X>30</drw:X>
+                        <drw:Y>100</drw:Y>
+                      </drw:Origin>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>SessionTimer</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="Text" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:AddText">
+                      <drw:Text>Time:   01:46:35.3640000 </drw:Text>
+                      <drw:Alignment>Near</drw:Alignment>
+                      <drw:LineAlignment>Near</drw:LineAlignment>
+                      <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
+                      <drw:Color>
+                        <drw:Val0>200</drw:Val0>
+                        <drw:Val1>200</drw:Val1>
+                        <drw:Val2>200</drw:Val2>
+                        <drw:Val3>255</drw:Val3>
+                      </drw:Color>
+                      <drw:Font>Microsoft Sans Serif, 48pt</drw:Font>
+                      <drw:Origin>
+                        <drw:X>750</drw:X>
+                        <drw:Y>5</drw:Y>
+                      </drw:Origin>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="SubscribeSubject">
+                    <Name>FileTimer</Name>
+                  </Expression>
+                  <Expression xsi:type="PropertyMapping">
+                    <PropertyMappings>
+                      <Property Name="Text" />
+                    </PropertyMappings>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:AddText">
+                      <drw:Text>File:   00:27:12.7370000 </drw:Text>
+                      <drw:Alignment>Near</drw:Alignment>
+                      <drw:LineAlignment>Near</drw:LineAlignment>
+                      <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
+                      <drw:Color>
+                        <drw:Val0>200</drw:Val0>
+                        <drw:Val1>200</drw:Val1>
+                        <drw:Val2>200</drw:Val2>
+                        <drw:Val3>255</drw:Val3>
+                      </drw:Color>
+                      <drw:Font>Microsoft Sans Serif, 48pt</drw:Font>
+                      <drw:Origin>
+                        <drw:X>810</drw:X>
+                        <drw:Y>100</drw:Y>
+                      </drw:Origin>
+                    </Combinator>
+                  </Expression>
+                  <Expression xsi:type="Combinator">
+                    <Combinator xsi:type="drw:DrawCanvas" />
+                  </Expression>
+                  <Expression xsi:type="WorkflowOutput" />
+                </Nodes>
+                <Edges>
+                  <Edge From="0" To="1" Label="Source1" />
+                  <Edge From="1" To="2" Label="Source1" />
+                  <Edge From="2" To="3" Label="Source1" />
+                  <Edge From="3" To="4" Label="Source1" />
+                  <Edge From="4" To="5" Label="Source1" />
+                  <Edge From="5" To="6" Label="Source1" />
+                  <Edge From="6" To="7" Label="Source1" />
+                  <Edge From="8" To="9" Label="Source1" />
+                  <Edge From="9" To="10" Label="Source1" />
+                  <Edge From="10" To="11" Label="Source1" />
+                  <Edge From="12" To="13" Label="Source1" />
+                  <Edge From="13" To="14" Label="Source1" />
+                  <Edge From="14" To="15" Label="Source1" />
+                  <Edge From="15" To="16" Label="Source1" />
+                  <Edge From="16" To="17" Label="Source1" />
+                  <Edge From="17" To="18" Label="Source1" />
+                  <Edge From="18" To="20" Label="Source1" />
+                  <Edge From="19" To="20" Label="Source2" />
+                  <Edge From="20" To="21" Label="Source1" />
+                  <Edge From="22" To="23" Label="Source1" />
+                  <Edge From="23" To="24" Label="Source1" />
+                  <Edge From="24" To="25" Label="Source1" />
+                  <Edge From="25" To="26" Label="Source1" />
+                  <Edge From="26" To="27" Label="Source1" />
+                  <Edge From="27" To="28" Label="Source1" />
+                  <Edge From="28" To="29" Label="Source1" />
+                  <Edge From="29" To="31" Label="Source1" />
+                  <Edge From="30" To="31" Label="Source2" />
+                  <Edge From="31" To="32" Label="Source1" />
+                  <Edge From="33" To="34" Label="Source1" />
+                  <Edge From="34" To="35" Label="Source1" />
+                  <Edge From="35" To="38" Label="Source1" />
+                  <Edge From="36" To="37" Label="Source1" />
+                  <Edge From="37" To="38" Label="Source2" />
+                  <Edge From="38" To="41" Label="Source1" />
+                  <Edge From="39" To="40" Label="Source1" />
+                  <Edge From="40" To="41" Label="Source2" />
+                  <Edge From="41" To="44" Label="Source1" />
+                  <Edge From="42" To="43" Label="Source1" />
+                  <Edge From="43" To="44" Label="Source2" />
+                  <Edge From="44" To="47" Label="Source1" />
+                  <Edge From="45" To="46" Label="Source1" />
+                  <Edge From="46" To="47" Label="Source2" />
+                  <Edge From="47" To="48" Label="Source1" />
+                  <Edge From="48" To="49" Label="Source1" />
+                </Edges>
+              </Workflow>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena1</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>ArenaAnnotation</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena2</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>ArenaAnnotation</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena1</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>CenteredVideo</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena1</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>PixelChange</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="viz:TimeSeriesVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena2</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>CenteredVideo</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena2</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>PixelChange</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="viz:TimeSeriesVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena3</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>ArenaAnnotation</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena4</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>ArenaAnnotation</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena3</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>CenteredVideo</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena3</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>PixelChange</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="viz:TimeSeriesVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena4</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>CenteredVideo</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="p2:IplImageVisualizer" />
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>Arena4</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>PixelChange</Selector>
+            </Expression>
+            <Expression xsi:type="VisualizerMapping">
+              <VisualizerType xsi:type="TypeMapping" TypeArguments="viz:TimeSeriesVisualizer" />
+            </Expression>
+            <Expression xsi:type="gui:TableLayoutPanelBuilder">
+              <gui:Enabled>true</gui:Enabled>
+              <gui:Visible>true</gui:Visible>
+              <gui:Font>Microsoft Sans Serif, 14pt, style=Bold</gui:Font>
+              <gui:ColumnCount>21</gui:ColumnCount>
+              <gui:RowCount>15</gui:RowCount>
+              <gui:ColumnStyles />
+              <gui:RowStyles />
+              <gui:CellSpans>
+                <gui:CellSpan ColumnSpan="21" RowSpan="1" />
+                <gui:CellSpan ColumnSpan="6" RowSpan="2" />
+                <gui:CellSpan ColumnSpan="15" RowSpan="2" />
+                <gui:CellSpan ColumnSpan="6" RowSpan="6" />
+                <gui:CellSpan ColumnSpan="6" RowSpan="6" />
+                <gui:CellSpan ColumnSpan="3" RowSpan="3" />
+                <gui:CellSpan ColumnSpan="6" RowSpan="3" />
+                <gui:CellSpan ColumnSpan="3" RowSpan="3" />
+                <gui:CellSpan ColumnSpan="6" RowSpan="3" />
+                <gui:CellSpan ColumnSpan="6" RowSpan="6" />
+                <gui:CellSpan ColumnSpan="6" RowSpan="6" />
+                <gui:CellSpan ColumnSpan="3" RowSpan="3" />
+                <gui:CellSpan ColumnSpan="6" RowSpan="3" />
+                <gui:CellSpan ColumnSpan="3" RowSpan="3" />
+                <gui:CellSpan ColumnSpan="6" RowSpan="3" />
+              </gui:CellSpans>
+            </Expression>
+            <Expression xsi:type="ui:VisualizerWindow">
+              <ui:Visible>true</ui:Visible>
+              <ui:Location>
+                <ui:X>0</ui:X>
+                <ui:Y>100</ui:Y>
+              </ui:Location>
+              <ui:Size>
+                <ui:Width>1350</ui:Width>
+                <ui:Height>900</ui:Height>
+              </ui:Size>
+              <ui:WindowState>Normal</ui:WindowState>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="9" To="50" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="11" To="50" Label="Source2" />
+            <Edge From="12" To="13" Label="Source1" />
+            <Edge From="13" To="50" Label="Source3" />
+            <Edge From="14" To="15" Label="Source1" />
+            <Edge From="15" To="16" Label="Source1" />
+            <Edge From="16" To="50" Label="Source4" />
+            <Edge From="17" To="18" Label="Source1" />
+            <Edge From="18" To="19" Label="Source1" />
+            <Edge From="19" To="50" Label="Source5" />
+            <Edge From="20" To="21" Label="Source1" />
+            <Edge From="21" To="22" Label="Source1" />
+            <Edge From="22" To="50" Label="Source6" />
+            <Edge From="23" To="24" Label="Source1" />
+            <Edge From="24" To="25" Label="Source1" />
+            <Edge From="25" To="50" Label="Source7" />
+            <Edge From="26" To="27" Label="Source1" />
+            <Edge From="27" To="28" Label="Source1" />
+            <Edge From="28" To="50" Label="Source8" />
+            <Edge From="29" To="30" Label="Source1" />
+            <Edge From="30" To="31" Label="Source1" />
+            <Edge From="31" To="50" Label="Source9" />
+            <Edge From="32" To="33" Label="Source1" />
+            <Edge From="33" To="34" Label="Source1" />
+            <Edge From="34" To="50" Label="Source10" />
+            <Edge From="35" To="36" Label="Source1" />
+            <Edge From="36" To="37" Label="Source1" />
+            <Edge From="37" To="50" Label="Source11" />
+            <Edge From="38" To="39" Label="Source1" />
+            <Edge From="39" To="40" Label="Source1" />
+            <Edge From="40" To="50" Label="Source12" />
+            <Edge From="41" To="42" Label="Source1" />
+            <Edge From="42" To="43" Label="Source1" />
+            <Edge From="43" To="50" Label="Source13" />
+            <Edge From="44" To="45" Label="Source1" />
+            <Edge From="45" To="46" Label="Source1" />
+            <Edge From="46" To="50" Label="Source14" />
+            <Edge From="47" To="48" Label="Source1" />
+            <Edge From="48" To="49" Label="Source1" />
+            <Edge From="49" To="50" Label="Source15" />
+            <Edge From="50" To="51" Label="Source1" />
+            <Edge From="51" To="52" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>EndRoutine</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="WorkflowInput">
+              <Name>Source1</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>LastFrame</Name>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:TakeUntil" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:TakeLast">
+                <rx:Count>1</rx:Count>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="2" Label="Source1" />
+            <Edge From="1" To="2" Label="Source2" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="WorkflowOutput" />
+    </Nodes>
+    <Edges>
+      <Edge From="0" To="1" Label="Source1" />
+      <Edge From="1" To="2" Label="Source1" />
+      <Edge From="2" To="4" Label="Source1" />
+      <Edge From="3" To="4" Label="Source2" />
+      <Edge From="4" To="5" Label="Source1" />
+      <Edge From="5" To="6" Label="Source1" />
+      <Edge From="6" To="7" Label="Source1" />
+      <Edge From="7" To="8" Label="Source1" />
+    </Edges>
+  </Workflow>
+</WorkflowBuilder>

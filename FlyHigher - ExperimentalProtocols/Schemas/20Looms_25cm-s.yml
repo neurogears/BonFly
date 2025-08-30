@@ -1,0 +1,42 @@
+%YAML 1.1
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/neurogears/BonFly/main/src/Schemas/StimuliSpecification.json
+
+trials:
+  [
+    {loomingCircleStimuli: &loomingCircleTrial {
+          animationSettings: &animationTrial
+            {
+              duration: 0.5,
+              initialRadius: 0.5,
+              initialVirtualDistance: 12.5,
+              linearApproachingVelocity: 25,
+              maxRadius: 12.5,
+              monitorDistance: 18.5,
+            },
+          delayOffset: 0,
+          delayOnset: 0,
+          backgroundColor: { a: 0, b: 0, g: 0, r: 0 },
+          color: { a: 1, b: 0, g: 0, r: 0 },
+        }
+    },    
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 1}}
+  ]
