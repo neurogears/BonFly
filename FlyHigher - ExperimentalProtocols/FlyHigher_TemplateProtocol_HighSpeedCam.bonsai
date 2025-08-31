@@ -17,6 +17,7 @@
                  xmlns:viz="clr-namespace:Bonsai.Design.Visualizers;assembly=Bonsai.Design.Visualizers"
                  xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
                  xmlns:p3="clr-namespace:AutomaticGenerators;assembly=Extensions"
+                 xmlns:zg="clr-namespace:Bonsai.Gui.ZedGraph;assembly=Bonsai.Gui.ZedGraph"
                  xmlns:cv="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision"
                  xmlns="https://bonsai-rx.org/2018/workflow">
   <Workflow>
@@ -6225,6 +6226,15 @@ LEDRamped = Shift + R
             <Expression xsi:type="MemberSelector">
               <Selector>GPIO</Selector>
             </Expression>
+            <Expression xsi:type="zg:RollingGraphBuilder">
+              <zg:ValueSelector>it</zg:ValueSelector>
+              <zg:SymbolType>None</zg:SymbolType>
+              <zg:LineWidth>3</zg:LineWidth>
+              <zg:CurveSettings />
+              <zg:Capacity>100000</zg:Capacity>
+              <zg:Min xsi:nil="true" />
+              <zg:Max xsi:nil="true" />
+            </Expression>
             <Expression xsi:type="ui:VisualizerWindow">
               <ui:Text>Signal - GPIO</ui:Text>
               <ui:Visible>true</ui:Visible>
@@ -6252,6 +6262,7 @@ LEDRamped = Shift + R
             <Edge From="10" To="11" Label="Source1" />
             <Edge From="12" To="13" Label="Source1" />
             <Edge From="13" To="14" Label="Source1" />
+            <Edge From="14" To="15" Label="Source1" />
           </Edges>
         </Workflow>
       </Expression>
