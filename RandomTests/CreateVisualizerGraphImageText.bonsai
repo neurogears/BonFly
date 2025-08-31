@@ -1,0 +1,782 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WorkflowBuilder Version="2.9.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xmlns:io="clr-namespace:Bonsai.IO;assembly=Bonsai.System"
+                 xmlns:scr="clr-namespace:Bonsai.Scripting.Expressions;assembly=Bonsai.Scripting.Expressions"
+                 xmlns:rx="clr-namespace:Bonsai.Reactive;assembly=Bonsai.Core"
+                 xmlns:cv="clr-namespace:Bonsai.Vision;assembly=Bonsai.Vision"
+                 xmlns:ipy="clr-namespace:Bonsai.Scripting.IronPython;assembly=Bonsai.Scripting.IronPython"
+                 xmlns:p1="clr-namespace:Bonsai.Vision.Design;assembly=Bonsai.Vision.Design"
+                 xmlns:zg="clr-namespace:Bonsai.Gui.ZedGraph;assembly=Bonsai.Gui.ZedGraph"
+                 xmlns:gui="clr-namespace:Bonsai.Gui;assembly=Bonsai.Gui"
+                 xmlns="https://bonsai-rx.org/2018/workflow">
+  <Workflow>
+    <Nodes>
+      <Expression xsi:type="GroupWorkflow">
+        <Name>DataStream</Name>
+        <Workflow>
+          <Nodes>
+            <Expression xsi:type="io:CsvReader">
+              <io:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\PostProcessing\Scored\MF-LC22_X_CS_ChS(NoRetinal)-20OptoPulsed15mWcm2-Female-4to5days-FH1-CamA-2025-08-28T12_17_04_fly0_scored.csv</io:FileName>
+              <io:ScanPattern />
+              <io:SkipRows>1</io:SkipRows>
+            </Expression>
+            <Expression xsi:type="Parse">
+              <Pattern>%s,%s,%s,%s,%s</Pattern>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="Parse">
+              <Pattern>%s,%f,%f,%f,%i</Pattern>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="Parse">
+              <Pattern>%i,%i,%i,%i</Pattern>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Name>Rename</scr:Name>
+              <scr:Expression>new(
+it as FrameIndex
+)</scr:Expression>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Take">
+                <rx:Count>1</rx:Count>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="rx:BehaviorSubject">
+              <Name>StartFrame</Name>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>StartFrame</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>FrameIndex</Selector>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="StartPosition" Selector="it" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="cv:FileCapture">
+                <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\PostProcessing\ArenaVideos\MF-LC22_X_CS_ChS(NoRetinal)-20OptoPulsed15mWcm2-Female-4to5days-FH1-CamA-2025-08-28T12_17_04_fly00.avi</cv:FileName>
+                <cv:PlaybackRate>60</cv:PlaybackRate>
+                <cv:StartPosition>307</cv:StartPosition>
+                <cv:PositionUnits>Frames</cv:PositionUnits>
+                <cv:Loop>false</cv:Loop>
+                <cv:Playing>true</cv:Playing>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="io:CsvReader">
+              <io:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\PostProcessing\Scored\MF-LC22_X_CS_ChS(NoRetinal)-20OptoPulsed15mWcm2-Female-4to5days-FH1-CamA-2025-08-28T12_17_04_fly0_scored.csv</io:FileName>
+              <io:ScanPattern />
+              <io:SkipRows>1</io:SkipRows>
+            </Expression>
+            <Expression xsi:type="SubscribeSubject">
+              <Name>StartFrame</Name>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>FrameIndex</Selector>
+            </Expression>
+            <Expression xsi:type="PropertyMapping">
+              <PropertyMappings>
+                <Property Name="StartPosition" Selector="it" />
+              </PropertyMappings>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="cv:FileCapture">
+                <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\PostProcessing\CropRaw\MF-LC22_X_CS_ChS(NoRetinal)-20OptoPulsed15mWcm2-Female-4to5days-FH1-CamA-2025-08-28T12_17_04_fly00.avi</cv:FileName>
+                <cv:PlaybackRate>60</cv:PlaybackRate>
+                <cv:StartPosition>307</cv:StartPosition>
+                <cv:PositionUnits>Frames</cv:PositionUnits>
+                <cv:Loop>false</cv:Loop>
+                <cv:Playing>true</cv:Playing>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:DelaySubscription">
+                <rx:DueTime>PT0.1S</rx:DueTime>
+              </Combinator>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1,Item3</Selector>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
+            </Expression>
+            <Expression xsi:type="Parse">
+              <Pattern>%s,%s,%s,%s,%s</Pattern>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="Parse">
+              <Pattern>%s,%f,%f,%f,%i</Pattern>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="Parse">
+              <Pattern>%i,%i,%i,%i</Pattern>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item1</Selector>
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Name>Rename</scr:Name>
+              <scr:Expression>new(
+it as FrameIndex
+)</scr:Expression>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item3</Selector>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item4</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Name>Rename</scr:Name>
+              <scr:Expression>new(
+Item1 as VisualStim,
+Item2 as Stim0,
+Item3 as Stim1
+)</scr:Expression>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item3</Selector>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item4</Selector>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item5</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Name>Rename</scr:Name>
+              <scr:Expression>new(
+Item1 as PositionX_mm,
+Item2 as PositionY_mm,
+Item3 as Speed,
+Item4 as Motion
+)</scr:Expression>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item2</Selector>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item3</Selector>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item4</Selector>
+            </Expression>
+            <Expression xsi:type="MemberSelector">
+              <Selector>Item5</Selector>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Name>Rename</scr:Name>
+              <scr:Expression>new(
+Item1 as Layer1,
+Item2 as Layer2,
+Item3 as Resistant,
+Item4 as Behavior
+)</scr:Expression>
+            </Expression>
+            <Expression xsi:type="Combinator">
+              <Combinator xsi:type="rx:Zip" />
+            </Expression>
+            <Expression xsi:type="scr:ExpressionTransform">
+              <scr:Name>Rename</scr:Name>
+              <scr:Expression>new(
+Item1.Item1 as VideoArena,
+Item1.Item2 as VideoCrop,
+Item2 as Index,
+Item3 as Stimuli,
+Item4 as Metrics,
+Item5 as Classification
+)</scr:Expression>
+            </Expression>
+            <Expression xsi:type="rx:PublishSubject">
+              <Name>DataStream</Name>
+            </Expression>
+            <Expression xsi:type="WorkflowOutput" />
+          </Nodes>
+          <Edges>
+            <Edge From="0" To="1" Label="Source1" />
+            <Edge From="1" To="2" Label="Source1" />
+            <Edge From="2" To="3" Label="Source1" />
+            <Edge From="3" To="4" Label="Source1" />
+            <Edge From="4" To="5" Label="Source1" />
+            <Edge From="5" To="6" Label="Source1" />
+            <Edge From="6" To="7" Label="Source1" />
+            <Edge From="7" To="8" Label="Source1" />
+            <Edge From="8" To="9" Label="Source1" />
+            <Edge From="10" To="11" Label="Source1" />
+            <Edge From="11" To="12" Label="Source1" />
+            <Edge From="12" To="13" Label="Source1" />
+            <Edge From="13" To="19" Label="Source1" />
+            <Edge From="14" To="19" Label="Source2" />
+            <Edge From="15" To="16" Label="Source1" />
+            <Edge From="16" To="17" Label="Source1" />
+            <Edge From="17" To="18" Label="Source1" />
+            <Edge From="18" To="19" Label="Source3" />
+            <Edge From="19" To="20" Label="Source1" />
+            <Edge From="20" To="21" Label="Source1" />
+            <Edge From="20" To="22" Label="Source1" />
+            <Edge From="21" To="47" Label="Source1" />
+            <Edge From="22" To="23" Label="Source1" />
+            <Edge From="23" To="24" Label="Source1" />
+            <Edge From="23" To="41" Label="Source1" />
+            <Edge From="23" To="42" Label="Source1" />
+            <Edge From="23" To="43" Label="Source1" />
+            <Edge From="23" To="44" Label="Source1" />
+            <Edge From="24" To="25" Label="Source1" />
+            <Edge From="25" To="26" Label="Source1" />
+            <Edge From="25" To="35" Label="Source1" />
+            <Edge From="25" To="36" Label="Source1" />
+            <Edge From="25" To="37" Label="Source1" />
+            <Edge From="25" To="38" Label="Source1" />
+            <Edge From="26" To="27" Label="Source1" />
+            <Edge From="27" To="28" Label="Source1" />
+            <Edge From="27" To="30" Label="Source1" />
+            <Edge From="27" To="31" Label="Source1" />
+            <Edge From="27" To="32" Label="Source1" />
+            <Edge From="28" To="29" Label="Source1" />
+            <Edge From="29" To="47" Label="Source2" />
+            <Edge From="30" To="33" Label="Source1" />
+            <Edge From="31" To="33" Label="Source2" />
+            <Edge From="32" To="33" Label="Source3" />
+            <Edge From="33" To="34" Label="Source1" />
+            <Edge From="34" To="47" Label="Source3" />
+            <Edge From="35" To="39" Label="Source1" />
+            <Edge From="36" To="39" Label="Source2" />
+            <Edge From="37" To="39" Label="Source3" />
+            <Edge From="38" To="39" Label="Source4" />
+            <Edge From="39" To="40" Label="Source1" />
+            <Edge From="40" To="47" Label="Source4" />
+            <Edge From="41" To="45" Label="Source1" />
+            <Edge From="42" To="45" Label="Source2" />
+            <Edge From="43" To="45" Label="Source3" />
+            <Edge From="44" To="45" Label="Source4" />
+            <Edge From="45" To="46" Label="Source1" />
+            <Edge From="46" To="47" Label="Source5" />
+            <Edge From="47" To="48" Label="Source1" />
+            <Edge From="48" To="49" Label="Source1" />
+            <Edge From="49" To="50" Label="Source1" />
+          </Edges>
+        </Workflow>
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>DataStream</Name>
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>VideoArena</Selector>
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>DataStream</Name>
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>VideoCrop</Selector>
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>DataStream</Name>
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>Classification.Behavior</Selector>
+      </Expression>
+      <Expression xsi:type="ipy:PythonTransform">
+        <ipy:Name>BehaviorColors</ipy:Name>
+        <ipy:Script>from System import Tuple
+@returns(Tuple[float, float, float, int])
+def process(value):
+  if value == 'Jump':
+    return Tuple.Create(0.53725490, 0.09411764, 0.3411764705882353, 1)
+
+  elif value == 'Walk':
+    return Tuple.Create(0.37647058, 0.3764705882352941, 0.9372549019607843, 1)
+
+  elif value == 'Stationary':
+    return Tuple.Create(0.3411764705882353, 0.8392156862745098, 0.9490196078431372, 1)
+
+  elif value == 'Freeze':
+    return Tuple.Create(0.8901960784313725, 0.7098039215686275, 0.17254901, 1)
+
+  elif value == 'Resistant_Freeze':
+    return Tuple.Create(0.47058823529411764, 0.3058823529411765, 0.09019607843137255, 1)
+
+  else:
+    return Tuple.Create(1, 1, 1, 1)
+</ipy:Script>
+      </Expression>
+      <Expression xsi:type="PropertyMapping">
+        <PropertyMappings>
+          <Property Name="Scale" Selector="Item1,Item2,Item3,Item4" />
+        </PropertyMappings>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="cv:ColorBalance">
+          <cv:Scale>
+            <cv:Val0>0.37647058</cv:Val0>
+            <cv:Val1>0.37647058823529411</cv:Val1>
+            <cv:Val2>0.93725490196078431</cv:Val2>
+            <cv:Val3>1</cv:Val3>
+          </cv:Scale>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="rx:PublishSubject">
+        <Name>ColorCrop</Name>
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>ColorCrop</Name>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:BufferCount">
+          <rx:Count>300</rx:Count>
+          <rx:Skip>1</rx:Skip>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Index">
+        <Operand xsi:type="IntProperty">
+          <Value>0</Value>
+        </Operand>
+      </Expression>
+      <Expression xsi:type="rx:PublishSubject">
+        <Name>DelayColorCrop</Name>
+      </Expression>
+      <Expression xsi:type="VisualizerMapping">
+        <VisualizerType xsi:type="TypeMapping" TypeArguments="p1:IplImageVisualizer" />
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>DataStream</Name>
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>VideoArena</Selector>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:BufferCount">
+          <rx:Count>300</rx:Count>
+          <rx:Skip>1</rx:Skip>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Index">
+        <Operand xsi:type="IntProperty">
+          <Value>0</Value>
+        </Operand>
+      </Expression>
+      <Expression xsi:type="rx:PublishSubject">
+        <Name>DelayVideoArena</Name>
+      </Expression>
+      <Expression xsi:type="VisualizerMapping">
+        <VisualizerType xsi:type="TypeMapping" TypeArguments="p1:IplImageVisualizer" />
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>BehaviorCode</Name>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:BufferCount">
+          <rx:Count>300</rx:Count>
+          <rx:Skip>1</rx:Skip>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Index">
+        <Operand xsi:type="IntProperty">
+          <Value>0</Value>
+        </Operand>
+      </Expression>
+      <Expression xsi:type="rx:PublishSubject">
+        <Name>DelayBehaviorCode</Name>
+      </Expression>
+      <Expression xsi:type="zg:RollingGraphBuilder">
+        <zg:IndexSelector>Frame</zg:IndexSelector>
+        <zg:ValueSelector>Behavior</zg:ValueSelector>
+        <zg:SymbolType>None</zg:SymbolType>
+        <zg:LineWidth>7</zg:LineWidth>
+        <zg:CurveSettings />
+        <zg:Capacity>300</zg:Capacity>
+        <zg:Min>0</zg:Min>
+        <zg:Max>100</zg:Max>
+      </Expression>
+      <Expression xsi:type="VisualizerMapping">
+        <VisualizerType xsi:type="TypeMapping" TypeArguments="zg:RollingGraphVisualizer" />
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>DataStream</Name>
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>Classification.Behavior</Selector>
+      </Expression>
+      <Expression xsi:type="ipy:PythonTransform">
+        <ipy:Name>BehaviorGraph</ipy:Name>
+        <ipy:Script>from System import Tuple
+@returns(int)
+def process(value):
+  if value == 'Jump':
+    return int(99)
+
+  elif value == 'Walk':
+    return int(75)
+
+  elif value == 'Stationary':
+    return int(50)
+
+  elif value == 'Freeze':
+    return int(25)
+
+  elif value == 'Resistant_Freeze':
+    return int(5)
+
+  else:
+    return int(0)
+</ipy:Script>
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>Index.FrameIndex</Selector>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:Zip" />
+      </Expression>
+      <Expression xsi:type="scr:ExpressionTransform">
+        <scr:Name>Rename</scr:Name>
+        <scr:Expression>new(
+Item1 as Behavior,
+Item2 as Frame
+)</scr:Expression>
+      </Expression>
+      <Expression xsi:type="rx:PublishSubject">
+        <Name>BehaviorCode</Name>
+      </Expression>
+      <Expression xsi:type="zg:RollingGraphBuilder">
+        <zg:IndexSelector>Frame</zg:IndexSelector>
+        <zg:ValueSelector>Behavior</zg:ValueSelector>
+        <zg:SymbolType>None</zg:SymbolType>
+        <zg:LineWidth>7</zg:LineWidth>
+        <zg:CurveSettings />
+        <zg:Capacity>300</zg:Capacity>
+        <zg:Min>0</zg:Min>
+        <zg:Max>100</zg:Max>
+      </Expression>
+      <Expression xsi:type="VisualizerMapping">
+        <VisualizerType xsi:type="TypeMapping" TypeArguments="zg:RollingGraphVisualizer" />
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>Speed</Name>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:BufferCount">
+          <rx:Count>300</rx:Count>
+          <rx:Skip>1</rx:Skip>
+        </Combinator>
+      </Expression>
+      <Expression xsi:type="Index">
+        <Operand xsi:type="IntProperty">
+          <Value>0</Value>
+        </Operand>
+      </Expression>
+      <Expression xsi:type="rx:PublishSubject">
+        <Name>DelaySpeed</Name>
+      </Expression>
+      <Expression xsi:type="zg:RollingGraphBuilder">
+        <zg:IndexSelector>Frame</zg:IndexSelector>
+        <zg:ValueSelector>Speed</zg:ValueSelector>
+        <zg:SymbolType>None</zg:SymbolType>
+        <zg:LineWidth>2</zg:LineWidth>
+        <zg:CurveSettings />
+        <zg:Capacity>300</zg:Capacity>
+        <zg:Min xsi:nil="true" />
+        <zg:Max xsi:nil="true" />
+      </Expression>
+      <Expression xsi:type="VisualizerMapping">
+        <VisualizerType xsi:type="TypeMapping" TypeArguments="zg:RollingGraphVisualizer" />
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>DataStream</Name>
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>Metrics.Speed</Selector>
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>Index.FrameIndex</Selector>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:Zip" />
+      </Expression>
+      <Expression xsi:type="scr:ExpressionTransform">
+        <scr:Name>Rename</scr:Name>
+        <scr:Expression>new(
+Item1 as Speed,
+Item2 as Frame
+)</scr:Expression>
+      </Expression>
+      <Expression xsi:type="rx:PublishSubject">
+        <Name>Speed</Name>
+      </Expression>
+      <Expression xsi:type="zg:RollingGraphBuilder">
+        <zg:IndexSelector>Frame</zg:IndexSelector>
+        <zg:ValueSelector>Speed</zg:ValueSelector>
+        <zg:SymbolType>None</zg:SymbolType>
+        <zg:LineWidth>2</zg:LineWidth>
+        <zg:CurveSettings />
+        <zg:Capacity>300</zg:Capacity>
+        <zg:Min xsi:nil="true" />
+        <zg:Max xsi:nil="true" />
+      </Expression>
+      <Expression xsi:type="VisualizerMapping">
+        <VisualizerType xsi:type="TypeMapping" TypeArguments="zg:RollingGraphVisualizer" />
+      </Expression>
+      <Expression xsi:type="gui:TableLayoutPanelBuilder">
+        <gui:Enabled>true</gui:Enabled>
+        <gui:Visible>true</gui:Visible>
+        <gui:ColumnCount>2</gui:ColumnCount>
+        <gui:RowCount>7</gui:RowCount>
+        <gui:ColumnStyles />
+        <gui:RowStyles />
+        <gui:CellSpans>
+          <gui:CellSpan ColumnSpan="1" RowSpan="3" />
+          <gui:CellSpan ColumnSpan="1" RowSpan="3" />
+          <gui:CellSpan ColumnSpan="1" RowSpan="2" />
+          <gui:CellSpan ColumnSpan="1" RowSpan="2" />
+          <gui:CellSpan ColumnSpan="1" RowSpan="2" />
+          <gui:CellSpan ColumnSpan="1" RowSpan="2" />
+        </gui:CellSpans>
+      </Expression>
+      <Expression xsi:type="SubscribeSubject">
+        <Name>DataStream</Name>
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>Index.FrameIndex</Selector>
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:DistinctUntilChanged" />
+      </Expression>
+      <Expression xsi:type="Combinator">
+        <Combinator xsi:type="rx:ElementIndex" />
+      </Expression>
+      <Expression xsi:type="MemberSelector">
+        <Selector>Index</Selector>
+      </Expression>
+      <Expression xsi:type="scr:ExpressionTransform">
+        <scr:Expression>it/60</scr:Expression>
+      </Expression>
+      <Expression xsi:type="scr:ExpressionTransform">
+        <scr:Name />
+        <scr:Expression>TimeSpan.FromSeconds(it)</scr:Expression>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="SubscribeSubject">
+          <Name>DataStream</Name>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="MemberSelector">
+          <Selector>Classification.Behavior</Selector>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="ipy:PythonTransform">
+          <ipy:Name>JumpBinary</ipy:Name>
+          <ipy:Script>from System import Tuple
+@returns(int)
+def process(value):
+  if value == 'Jump':
+    return int(1)
+  else:
+    return int(0)
+</ipy:Script>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="ipy:PythonTransform">
+          <ipy:Name>WalkBinary</ipy:Name>
+          <ipy:Script>from System import Tuple
+@returns(int)
+def process(value):
+  if value == 'Walk':
+    return int(1)
+  else:
+    return int(0)
+</ipy:Script>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="ipy:PythonTransform">
+          <ipy:Name>StationaryBinary</ipy:Name>
+          <ipy:Script>from System import Tuple
+@returns(int)
+def process(value):
+  if value == 'Stationary':
+    return int(1)
+  else:
+    return int(0)
+</ipy:Script>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="ipy:PythonTransform">
+          <ipy:Name>FreezeBinary</ipy:Name>
+          <ipy:Script>from System import Tuple
+@returns(int)
+def process(value):
+  if value == 'Freeze':
+    return int(1)
+  else:
+    return int(0)
+</ipy:Script>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="ipy:PythonTransform">
+          <ipy:Name>ResistantFreezeBinary</ipy:Name>
+          <ipy:Script>from System import Tuple
+@returns(int)
+def process(value):
+  if value == 'Resistant_Freeze':
+    return int(1)
+  else:
+    return int(0)
+</ipy:Script>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="MemberSelector">
+          <Selector>Index.FrameIndex</Selector>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="Combinator">
+          <Combinator xsi:type="rx:Zip" />
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="scr:ExpressionTransform">
+          <scr:Name>Rename</scr:Name>
+          <scr:Expression>new(
+Item1 as Jump,
+Item2 as Walk,
+Item3 as Stationary,
+Item4 as Freeze,
+Item5 as ResistantFreeze,
+Item6 as FrameIndex
+)</scr:Expression>
+        </Builder>
+      </Expression>
+      <Expression xsi:type="Disable">
+        <Builder xsi:type="zg:RollingGraphBuilder">
+          <zg:IndexSelector>FrameIndex</zg:IndexSelector>
+          <zg:ValueSelector>Jump,Walk,Stationary,Freeze,ResistantFreeze</zg:ValueSelector>
+          <zg:SymbolType>Square</zg:SymbolType>
+          <zg:LineWidth>10</zg:LineWidth>
+          <zg:CurveSettings>
+            <zg:CurveConfiguration>
+              <zg:Label>Jump</zg:Label>
+              <zg:Color>#8080FF</zg:Color>
+            </zg:CurveConfiguration>
+            <zg:CurveConfiguration>
+              <zg:Label>Walk</zg:Label>
+              <zg:Color>#FF8080</zg:Color>
+            </zg:CurveConfiguration>
+          </zg:CurveSettings>
+          <zg:Capacity>300</zg:Capacity>
+          <zg:Min>0.99</zg:Min>
+          <zg:Max>1.01</zg:Max>
+        </Builder>
+      </Expression>
+    </Nodes>
+    <Edges>
+      <Edge From="1" To="2" Label="Source1" />
+      <Edge From="3" To="4" Label="Source1" />
+      <Edge From="4" To="9" Label="Source1" />
+      <Edge From="5" To="6" Label="Source1" />
+      <Edge From="6" To="7" Label="Source1" />
+      <Edge From="7" To="8" Label="Source1" />
+      <Edge From="8" To="9" Label="Source2" />
+      <Edge From="9" To="10" Label="Source1" />
+      <Edge From="11" To="12" Label="Source1" />
+      <Edge From="12" To="13" Label="Source1" />
+      <Edge From="13" To="14" Label="Source1" />
+      <Edge From="14" To="15" Label="Source1" />
+      <Edge From="15" To="51" Label="Source1" />
+      <Edge From="16" To="17" Label="Source1" />
+      <Edge From="17" To="18" Label="Source1" />
+      <Edge From="18" To="19" Label="Source1" />
+      <Edge From="19" To="20" Label="Source1" />
+      <Edge From="20" To="21" Label="Source1" />
+      <Edge From="21" To="51" Label="Source2" />
+      <Edge From="22" To="23" Label="Source1" />
+      <Edge From="23" To="24" Label="Source1" />
+      <Edge From="24" To="25" Label="Source1" />
+      <Edge From="25" To="26" Label="Source1" />
+      <Edge From="26" To="27" Label="Source1" />
+      <Edge From="27" To="51" Label="Source3" />
+      <Edge From="28" To="29" Label="Source1" />
+      <Edge From="28" To="31" Label="Source1" />
+      <Edge From="29" To="30" Label="Source1" />
+      <Edge From="30" To="32" Label="Source1" />
+      <Edge From="31" To="32" Label="Source2" />
+      <Edge From="32" To="33" Label="Source1" />
+      <Edge From="33" To="34" Label="Source1" />
+      <Edge From="34" To="35" Label="Source1" />
+      <Edge From="35" To="36" Label="Source1" />
+      <Edge From="36" To="51" Label="Source4" />
+      <Edge From="37" To="38" Label="Source1" />
+      <Edge From="38" To="39" Label="Source1" />
+      <Edge From="39" To="40" Label="Source1" />
+      <Edge From="40" To="41" Label="Source1" />
+      <Edge From="41" To="42" Label="Source1" />
+      <Edge From="42" To="51" Label="Source5" />
+      <Edge From="43" To="44" Label="Source1" />
+      <Edge From="43" To="45" Label="Source1" />
+      <Edge From="44" To="46" Label="Source1" />
+      <Edge From="45" To="46" Label="Source2" />
+      <Edge From="46" To="47" Label="Source1" />
+      <Edge From="47" To="48" Label="Source1" />
+      <Edge From="48" To="49" Label="Source1" />
+      <Edge From="49" To="50" Label="Source1" />
+      <Edge From="50" To="51" Label="Source6" />
+      <Edge From="52" To="53" Label="Source1" />
+      <Edge From="53" To="54" Label="Source1" />
+      <Edge From="54" To="55" Label="Source1" />
+      <Edge From="55" To="56" Label="Source1" />
+      <Edge From="56" To="57" Label="Source1" />
+      <Edge From="57" To="58" Label="Source1" />
+      <Edge From="59" To="60" Label="Source1" />
+      <Edge From="59" To="66" Label="Source1" />
+      <Edge From="60" To="61" Label="Source1" />
+      <Edge From="60" To="62" Label="Source1" />
+      <Edge From="60" To="63" Label="Source1" />
+      <Edge From="60" To="64" Label="Source1" />
+      <Edge From="60" To="65" Label="Source1" />
+      <Edge From="61" To="67" Label="Source1" />
+      <Edge From="62" To="67" Label="Source2" />
+      <Edge From="63" To="67" Label="Source3" />
+      <Edge From="64" To="67" Label="Source4" />
+      <Edge From="65" To="67" Label="Source5" />
+      <Edge From="66" To="67" Label="Source6" />
+      <Edge From="67" To="68" Label="Source1" />
+      <Edge From="68" To="69" Label="Source1" />
+    </Edges>
+  </Workflow>
+</WorkflowBuilder>
