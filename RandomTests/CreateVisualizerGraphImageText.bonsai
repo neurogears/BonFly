@@ -67,7 +67,7 @@ it as FrameIndex
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:FileCapture">
                 <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\PostProcessing\ArenaVideos\MF-LC22_X_CS_ChS(NoRetinal)-20OptoPulsed15mWcm2-Female-4to5days-FH1-CamA-2025-08-28T12_17_04_fly00.avi</cv:FileName>
-                <cv:PlaybackRate>60</cv:PlaybackRate>
+                <cv:PlaybackRate>0</cv:PlaybackRate>
                 <cv:StartPosition>307</cv:StartPosition>
                 <cv:PositionUnits>Frames</cv:PositionUnits>
                 <cv:Loop>false</cv:Loop>
@@ -93,7 +93,7 @@ it as FrameIndex
             <Expression xsi:type="Combinator">
               <Combinator xsi:type="cv:FileCapture">
                 <cv:FileName>C:\Users\MF\Documents\GitHub\Bonfly\Personal-Bonfly\ExampleVideos\PostProcessing\CropRaw\MF-LC22_X_CS_ChS(NoRetinal)-20OptoPulsed15mWcm2-Female-4to5days-FH1-CamA-2025-08-28T12_17_04_fly00.avi</cv:FileName>
-                <cv:PlaybackRate>60</cv:PlaybackRate>
+                <cv:PlaybackRate>0</cv:PlaybackRate>
                 <cv:StartPosition>307</cv:StartPosition>
                 <cv:PositionUnits>Frames</cv:PositionUnits>
                 <cv:Loop>false</cv:Loop>
@@ -340,9 +340,9 @@ def process(value):
       <Expression xsi:type="Combinator">
         <Combinator xsi:type="cv:ColorBalance">
           <cv:Scale>
-            <cv:Val0>0.37647058</cv:Val0>
-            <cv:Val1>0.37647058823529411</cv:Val1>
-            <cv:Val2>0.93725490196078431</cv:Val2>
+            <cv:Val0>0.3411764705882353</cv:Val0>
+            <cv:Val1>0.83921568627450982</cv:Val1>
+            <cv:Val2>0.94901960784313721</cv:Val2>
             <cv:Val3>1</cv:Val3>
           </cv:Scale>
         </Combinator>
