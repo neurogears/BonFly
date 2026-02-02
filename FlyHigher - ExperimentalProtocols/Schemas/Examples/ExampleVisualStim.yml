@@ -1,0 +1,60 @@
+%YAML 1.1
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/neurogears/BonFly/main/src/Schemas/StimuliSpecification.json
+
+trials:
+  [
+    #Looming stimulus, black disk
+    {loomingCircleStimuli: &loomingCircleTrial
+        {animationSettings: &animationTrial 
+            {
+              duration: 0.5,                              #in sec - should match the theoretical time of contact, i.e. initial distance / aprroaching speed
+              initialRadius: 0.5,                         #in cm - from the fly's perspective, it takes into account monitor distance when rendering (Moita standard = 0.5cm)
+              initialVirtualDistance: 12.5,               #in cm
+              linearApproachingVelocity: 25,              #in cm/s
+              maxRadius: 12.5,                            #in cm - maximum size of the loom, plateaus if larger (Moita standard = 12.5cm)
+              monitorDistance: 18.5,                      #in cm (FlyHigher setups = 18.5cm)
+            },
+          delayOffset: 0,                                 #in sec - extend stimulus plateau after duration
+          delayOnset: 5,                                  #in sec - from previous stimulus OFFSET - SHOULD BE ADJUSTED ACCORDING STIMULUS DURATION!
+          backgroundColor: { a: 0, b: 0, g: 0, r: 0},     #in RGBA - if all set to 0, monitor background color will be the determinant. If modular, monitor color should be set to transparent
+          color: { a: 1, b: 0, g: 0, r: 0},               #in RGBA
+        }
+    },
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 9.5, animationSettings: {<<: *animationTrial, duration: 1}}},
+    {loomingCircleStimuli: { <<: *loomingCircleTrial, delayOnset: 5.5}},
+
+
+    #Control
+    {controlNoisyStimuli: &controlTrial
+        {animationSettings: &animationTrial 
+            {                                             #When using control, params should match the looming
+              duration: 0.5,                                
+              initialRadius: 0.5,                           
+              initialVirtualDistance: 12.5,               
+              linearApproachingVelocity: 25,
+              monitorDistance: 18.5,
+            },
+          delayOffset: 0,
+          delayOnset: 1,
+          backgroundColor: { a: 0, b: 0, g: 0, r: 0 },  
+          diameter: 25,                                   #equivalente of loom maxRadius
+          offColor: { a: 0, b: 0, g: 0, r: 0 },           #color of the circle when not filled
+          onColor: { a: 1, b: 0, g: 0, r: 0 },            #color of the filling dots
+        }
+    },
+
+
+    # Translational
+    {movingCircleStimuli: &movingCircleTrial
+          {startPosition: { x: 0, y: 0 },                 #in cm - center = 0, 0; min = -15, -15; max = 15, 15
+          endPosition: { x: 5, y: -5 },                   #in cm 
+          delayOffset: 0,
+          delayOnset: 5,
+          backgroundColor: { a: 0, b: 0, g: 0, r: 0},
+          color: { a: 1, b: 0, g: 0, r: 0},
+          radius: 1,
+          duration: 3
+        }
+    }
+  ]

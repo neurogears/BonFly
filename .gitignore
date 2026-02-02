@@ -1,14 +1,22 @@
-# Bonsai scripting files
-.vs
-.vscode
-bin
-obj
-Packages
-Data
-*.bin
-*.avi
-*.dll
-*.exe
-*.exe.settings
-Bonsai.exe.WebView2
+# ignore local folders
+ExampleVideos
+# State recovery and log files
+~*
+*.log
 
+# Bonsai scripting and environment files
+.bonsai/*
+!.bonsai/Bonsai.config
+!.bonsai/NuGet.config
+
+# Byte-compiled / optimized / DLL files
+_pycache_/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv
+winpython
+
+# uv local files
+uv.lock

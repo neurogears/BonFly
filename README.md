@@ -1,4 +1,5 @@
 # BonFly
+Bonfly repository of the MoitaLab
 
 ## Setting up
 
