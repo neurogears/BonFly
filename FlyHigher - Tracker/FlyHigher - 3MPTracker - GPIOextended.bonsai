@@ -671,6 +671,90 @@ Item3 as EnableSleap)</scr:Expression>
                             <cv:ThresholdType>Binary</cv:ThresholdType>
                           </Combinator>
                         </Expression>
+                        <Expression xsi:type="GroupWorkflow">
+                          <Name>ExcludeLargest</Name>
+                          <Workflow>
+                            <Nodes>
+                              <Expression xsi:type="WorkflowInput">
+                                <Name>Source1</Name>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:FindContours">
+                                  <cv:Mode>ConnectedComponent</cv:Mode>
+                                  <cv:Method>ChainApproxNone</cv:Method>
+                                  <cv:Offset>
+                                    <cv:X>0</cv:X>
+                                    <cv:Y>0</cv:Y>
+                                  </cv:Offset>
+                                  <cv:MinArea>290000</cv:MinArea>
+                                  <cv:MaxArea xsi:nil="true" />
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:BinaryRegionAnalysis" />
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:LargestBinaryRegion" />
+                              </Expression>
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>Contour</Selector>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:DrawContours">
+                                  <cv:MaxLevel>0</cv:MaxLevel>
+                                  <cv:Thickness>-1</cv:Thickness>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="BitwiseNot" />
+                              <Expression xsi:type="MemberSelector">
+                                <Selector>RegionOfInterest</Selector>
+                              </Expression>
+                              <Expression xsi:type="PropertyMapping">
+                                <PropertyMappings>
+                                  <Property Name="RegionOfInterest" />
+                                </PropertyMappings>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:DrawContours">
+                                  <cv:MaxLevel>1</cv:MaxLevel>
+                                  <cv:Thickness>-1</cv:Thickness>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="cv:Crop">
+                                  <cv:RegionOfInterest>
+                                    <cv:X>0</cv:X>
+                                    <cv:Y>0</cv:Y>
+                                    <cv:Width>1534</cv:Width>
+                                    <cv:Height>1534</cv:Height>
+                                  </cv:RegionOfInterest>
+                                </Combinator>
+                              </Expression>
+                              <Expression xsi:type="Combinator">
+                                <Combinator xsi:type="rx:Zip" />
+                              </Expression>
+                              <Expression xsi:type="BitwiseAnd" />
+                              <Expression xsi:type="WorkflowOutput" />
+                            </Nodes>
+                            <Edges>
+                              <Edge From="0" To="1" Label="Source1" />
+                              <Edge From="1" To="2" Label="Source1" />
+                              <Edge From="1" To="9" Label="Source1" />
+                              <Edge From="2" To="3" Label="Source1" />
+                              <Edge From="3" To="4" Label="Source1" />
+                              <Edge From="4" To="5" Label="Source1" />
+                              <Edge From="5" To="6" Label="Source1" />
+                              <Edge From="6" To="7" Label="Source1" />
+                              <Edge From="6" To="11" Label="Source2" />
+                              <Edge From="7" To="8" Label="Source1" />
+                              <Edge From="8" To="10" Label="Source1" />
+                              <Edge From="9" To="10" Label="Source2" />
+                              <Edge From="10" To="11" Label="Source1" />
+                              <Edge From="11" To="12" Label="Source1" />
+                              <Edge From="12" To="13" Label="Source1" />
+                            </Edges>
+                          </Workflow>
+                        </Expression>
                         <Expression xsi:type="Combinator">
                           <Combinator xsi:type="cv:FindContours">
                             <cv:Mode>ConnectedComponent</cv:Mode>
@@ -680,7 +764,7 @@ Item3 as EnableSleap)</scr:Expression>
                               <cv:Y>0</cv:Y>
                             </cv:Offset>
                             <cv:MinArea>290000</cv:MinArea>
-                            <cv:MaxArea>380000</cv:MaxArea>
+                            <cv:MaxArea xsi:nil="true" />
                           </Combinator>
                         </Expression>
                         <Expression xsi:type="Combinator">
@@ -762,6 +846,7 @@ Item3 as EnableSleap)</scr:Expression>
                         <Edge From="4" To="5" Label="Source1" />
                         <Edge From="5" To="6" Label="Source1" />
                         <Edge From="6" To="7" Label="Source1" />
+                        <Edge From="7" To="8" Label="Source1" />
                       </Edges>
                     </Workflow>
                   </Expression>
@@ -978,10 +1063,10 @@ Item3 as EnableSleap)</scr:Expression>
                                     <Expression xsi:type="Combinator">
                                       <Combinator xsi:type="cv:Crop">
                                         <cv:RegionOfInterest>
-                                          <cv:X>47</cv:X>
-                                          <cv:Y>842</cv:Y>
-                                          <cv:Width>664</cv:Width>
-                                          <cv:Height>667</cv:Height>
+                                          <cv:X>51</cv:X>
+                                          <cv:Y>54</cv:Y>
+                                          <cv:Width>669</cv:Width>
+                                          <cv:Height>663</cv:Height>
                                         </cv:RegionOfInterest>
                                       </Combinator>
                                     </Expression>
@@ -1102,10 +1187,10 @@ Item3 as EnableSleap)</scr:Expression>
                                           <Expression xsi:type="Combinator">
                                             <Combinator xsi:type="cv:Crop">
                                               <cv:RegionOfInterest>
-                                                <cv:X>47</cv:X>
-                                                <cv:Y>842</cv:Y>
-                                                <cv:Width>664</cv:Width>
-                                                <cv:Height>667</cv:Height>
+                                                <cv:X>51</cv:X>
+                                                <cv:Y>54</cv:Y>
+                                                <cv:Width>669</cv:Width>
+                                                <cv:Height>663</cv:Height>
                                               </cv:RegionOfInterest>
                                             </Combinator>
                                           </Expression>
@@ -1549,8 +1634,8 @@ Item1.Y / Item2.Height as Y
                               </Expression>
                               <Expression xsi:type="Combinator">
                                 <Combinator xsi:type="cv:CreatePoint2f">
-                                  <cv:X>0.240687862</cv:X>
-                                  <cv:Y>0.847157</cv:Y>
+                                  <cv:X>0.329201072</cv:X>
+                                  <cv:Y>0.08612011</cv:Y>
                                 </Combinator>
                               </Expression>
                               <Expression xsi:type="rx:PublishSubject">
@@ -1791,8 +1876,8 @@ Item1.Y / Item2.Height as Y
                               <Expression xsi:type="Combinator">
                                 <Combinator xsi:type="drw:CreateCanvas">
                                   <drw:Size>
-                                    <drw:Width>650</drw:Width>
-                                    <drw:Height>658</drw:Height>
+                                    <drw:Width>653</drw:Width>
+                                    <drw:Height>653</drw:Height>
                                   </drw:Size>
                                   <drw:Depth>U8</drw:Depth>
                                   <drw:Channels>3</drw:Channels>
@@ -1836,8 +1921,8 @@ Item1.Y / Item2.Height as Y
                                   <drw:Destination>
                                     <drw:X>0</drw:X>
                                     <drw:Y>0</drw:Y>
-                                    <drw:Width>650</drw:Width>
-                                    <drw:Height>658</drw:Height>
+                                    <drw:Width>653</drw:Width>
+                                    <drw:Height>653</drw:Height>
                                   </drw:Destination>
                                   <drw:Interpolation>Linear</drw:Interpolation>
                                 </Combinator>
@@ -2046,7 +2131,7 @@ def process(value):
                               </Expression>
                               <Expression xsi:type="Combinator">
                                 <Combinator xsi:type="drw:AddText">
-                                  <drw:Text># 1753</drw:Text>
+                                  <drw:Text># 238</drw:Text>
                                   <drw:Alignment>Near</drw:Alignment>
                                   <drw:LineAlignment>Near</drw:LineAlignment>
                                   <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
@@ -2120,7 +2205,7 @@ def process(value):
                               </Expression>
                               <Expression xsi:type="Combinator">
                                 <Combinator xsi:type="drw:AddText">
-                                  <drw:Text>00:00:29 </drw:Text>
+                                  <drw:Text>00:00:03 </drw:Text>
                                   <drw:Alignment>Near</drw:Alignment>
                                   <drw:LineAlignment>Near</drw:LineAlignment>
                                   <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
@@ -5310,7 +5395,7 @@ def process(value):
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="drw:AddText">
-                      <drw:Text>Frame: 1753</drw:Text>
+                      <drw:Text>Frame: 238</drw:Text>
                       <drw:Alignment>Near</drw:Alignment>
                       <drw:LineAlignment>Near</drw:LineAlignment>
                       <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
@@ -5337,7 +5422,7 @@ def process(value):
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="drw:AddText">
-                      <drw:Text>Time:   00:00:37.0560000 </drw:Text>
+                      <drw:Text>Time:   00:00:04.8420000 </drw:Text>
                       <drw:Alignment>Near</drw:Alignment>
                       <drw:LineAlignment>Near</drw:LineAlignment>
                       <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
@@ -5364,7 +5449,7 @@ def process(value):
                   </Expression>
                   <Expression xsi:type="Combinator">
                     <Combinator xsi:type="drw:AddText">
-                      <drw:Text>File:   00:00:37.0560000 </drw:Text>
+                      <drw:Text>File:   00:00:04.8420000 </drw:Text>
                       <drw:Alignment>Near</drw:Alignment>
                       <drw:LineAlignment>Near</drw:LineAlignment>
                       <drw:TextRenderingHint>AntiAliasGridFit</drw:TextRenderingHint>
